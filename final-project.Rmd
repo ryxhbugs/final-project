@@ -1,0 +1,46 @@
+---
+title: "Workshop 31/(? group number) Project"
+output: html_document
+author: "Ryan Hall, (add name here)"
+date: "2022-11-16"
+---
+# Do geographical location and characteristics have an effect on internet quality of life in the UK? An analysis of and comparison between two months in 2019
+
+### Load required packages
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(janitor)
+```
+
+### Read in data from csv files
+
+```{r load-data, message = FALSE}
+
+feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
+aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
+gdhi_region <- read.csv("data/gdhi_per_region.csv", skip = 1)
+
+```
+
+### Tidy the datasets to make them easier to use
+
+```{r clean-data}
+feb_2019 <- feb_2019 %>%
+  clean_names() %>%
+  select(-ofcom_product) %>%    # These steps are to make the columns match the August dataset.
+  rename("distance_from_exchange" = "distance_from_exchange_band")
+  
+aug_2019 <- aug_2019 %>%
+  clean_names()
+
+regions <- c("United Kingdom", "England", "North East", "North West", "Yorkshire & Humber", "East Midlands", 
+             "West Midlands", "East", "London", "South East", "South West", "Wales", "Scotland", "Northern Ireland")
+
+gdhi_region <- gdhi_region %>%
+  clean_names() %>%
+  drop_na() %>%
+  rename("region" = "countries_and_regions_of_the_uk") %>%
+  mutate(region = regions)
+
+```
