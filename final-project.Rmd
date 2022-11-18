@@ -10,6 +10,7 @@ date: "2022-11-16"
 
 ```{r load-packages, message = FALSE, warning = FALSE}
 library(tidyverse)
+library(tidymodels)
 library(janitor)
 library(geojsonio)
 ```
@@ -42,7 +43,10 @@ gdhi_region <- gdhi_region %>%
   clean_names() %>%
   drop_na() %>%
   rename("region" = "countries_and_regions_of_the_uk") %>%
-  mutate(region = regions)
+  mutate(region = regions,
+         gdhi_per_head = str_remove_all(gdhi_per_head, ","),
+         gdhi_per_head = as.numeric(gdhi_per_head)
+         )
 
 ```
 
@@ -50,6 +54,13 @@ gdhi_region <- gdhi_region %>%
 region_map <- geojson_read("uk_regions.geojson")
 ```
 
-```{r modelling}
-
+# Houshold Income vs 24 hour Download Speed
+```{r income-24h_download}
+feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
+feb_reg_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ gdhi_per_head, data= feb_gdhi_join) %>%
+  tidy()
+feb_reg_gdhi_fit
+  
 ```
