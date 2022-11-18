@@ -62,5 +62,4 @@ feb_24h_ads_gdhi_fit <- linear_reg() %>%
   fit(x24_hr_average_download_speed ~ gdhi_per_head, data= feb_gdhi_join) %>%
   tidy()
 feb_24h_ads_gdhi_fit
-  
 ```

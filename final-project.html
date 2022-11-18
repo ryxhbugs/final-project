@@ -402,19 +402,11 @@ gdhi_region &lt;- gdhi_region %&gt;%
 <div id="houshold-income-vs-24-hour-download-speed" class="section level1">
 <h1>Houshold Income vs 24 hour Download Speed</h1>
 <pre class="r"><code>feb_gdhi_join &lt;- left_join(feb_2019, gdhi_region , by = &quot;region&quot;)
-<<<<<<< HEAD
 feb_24h_ads_gdhi_fit &lt;- linear_reg() %&gt;%
   set_engine(&quot;lm&quot;) %&gt;%
   fit(x24_hr_average_download_speed ~ gdhi_per_head, data= feb_gdhi_join) %&gt;%
   tidy()
 feb_24h_ads_gdhi_fit</code></pre>
-=======
-feb_reg_gdhi_fit &lt;- linear_reg() %&gt;%
-  set_engine(&quot;lm&quot;) %&gt;%
-  fit(x24_hr_average_download_speed ~ gdhi_per_head, data= feb_gdhi_join) %&gt;%
-  tidy()
-feb_reg_gdhi_fit</code></pre>
->>>>>>> d4cb87f0242ea0d682979dc2e17517ded581e1cb
 <pre><code>## # A tibble: 2 × 5
 ##   term          estimate std.error statistic   p.value
 ##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
