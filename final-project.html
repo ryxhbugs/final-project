@@ -299,17 +299,23 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+content: "";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "\e258";
-font-family: 'Glyphicons Halflings';
+content: "";
 border: none;
+}
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "";
+font-family: 'Glyphicons Halflings';
+display: inline-block;
+padding: 10px;
+border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -396,7 +402,7 @@ gdhi_region &lt;- gdhi_region %&gt;%
          gdhi_per_head = str_remove_all(gdhi_per_head, &quot;,&quot;),
          gdhi_per_head = as.numeric(gdhi_per_head)
          )</code></pre>
-<pre class="r"><code>region_map &lt;- geojson_read(&quot;uk_regions.geojson&quot;)</code></pre>
+<pre class="r"><code>region_map &lt;- geojson_read(&quot;uk_regions.geojson&quot;, what = &quot;sp&quot;)</code></pre>
 </div>
 </div>
 <div id="houshold-income-vs-24-hour-download-speed" class="section level1">

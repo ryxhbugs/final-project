@@ -51,7 +51,7 @@ gdhi_region <- gdhi_region %>%
 ```
 
 ```{r maps}
-region_map <- geojson_read("uk_regions.geojson")
+region_map <- geojson_read("uk_regions.geojson", what = "sp")
 ```
 
 # Houshold Income vs 24 hour Download Speed
