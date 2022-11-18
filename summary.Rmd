@@ -1,0 +1,49 @@
+---
+title: Project title
+author: by Team name
+output: html_document
+---
+
+## Research Question
+
+Describe your research question here. Include why this question might be of interest. 
+
+## Data
+
+Briefly describe your dataset here - include a description of the key variables you will be investigating. 
+Include a citation for your data. 
+See http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840 for guidance on proper citation for datasets. 
+If you got your data off the web, make sure to note the retrieval date.
+
+## Findings
+
+The write-up of your project and findings go here. 
+
+Think of this as the text of your presentation with some extra detail to cover what there was not time to discuss in the presentation. This might include any assumptions you made when doing your analysis, any limitations of the work you have done or any ideas you have for future work. Feel free to split this section into subsections to make it easier to read. 
+
+The length should be roughly 1,500 words. 
+If you want to use a word count addin, you can install this by copying and pasting the following into RStudio:
+
+`devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)`
+
+You will then need to restart RStudio. Once you have done that, select the text you want to count the words of, go to Addins, and select the `Word count` addin.
+This addin counts words using two different algorithms, but the results should be similar and as long as you're in the ballpark of 1,500 words, you're good! 
+The addin will ignore code chunks and only count the words in prose. If you don't want to use the addin you can always copy and paste the text into Microsoft Word to do a Word Count!
+
+You can also load your data here and present any analysis results / plots.
+Make sure to hide your code with  `echo = FALSE` unless the point you are trying to make is about the code itself, in which case you should show your code.
+
+
+```{r load-data, echo = FALSE}
+# load data here, if you like
+```
+
+## Presentation
+
+Our presentation can be found [here](presentation/presentation.html).
+
+
+## References
+
+List any references here. You should, at a minimum, list your data source.
+
