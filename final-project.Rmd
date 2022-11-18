@@ -63,3 +63,12 @@ feb_24h_ads_gdhi_fit <- linear_reg() %>%
   tidy()
 feb_24h_ads_gdhi_fit
 ```
+
+# Urban/Rural vs 24 hour Download Speed
+```{r urbanrural-24h_download}
+feb_24h_ads_ur_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data= feb_gdhi_join) %>%
+  tidy()
+feb_24h_ads_ur_fit
+```
