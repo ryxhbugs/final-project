@@ -299,17 +299,23 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+content: "";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "\e258";
-font-family: 'Glyphicons Halflings';
+content: "";
 border: none;
+}
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "";
+font-family: 'Glyphicons Halflings';
+display: inline-block;
+padding: 10px;
+border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -392,6 +398,7 @@ gdhi_region &lt;- gdhi_region %&gt;%
   drop_na() %&gt;%
   rename(&quot;region&quot; = &quot;countries_and_regions_of_the_uk&quot;) %&gt;%
   mutate(region = regions)</code></pre>
+<pre class="r"><code>region_map &lt;- geojson_read(&quot;uk_regions.geojson&quot;)</code></pre>
 </div>
 </div>
 

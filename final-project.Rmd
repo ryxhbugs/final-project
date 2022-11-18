@@ -45,3 +45,7 @@ gdhi_region <- gdhi_region %>%
   mutate(region = regions)
 
 ```
+
+```{r maps}
+region_map <- geojson_read("uk_regions.geojson")
+```
