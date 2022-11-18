@@ -54,7 +54,7 @@ gdhi_region <- gdhi_region %>%
 region_map <- geojson_read("uk_regions.geojson", what = "sp")
 ```
 
-# Houshold Income vs 24 hour Download Speed
+### Household Income vs 24 hour Download Speed
 ```{r income-24h_download}
 feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
 feb_24h_ads_gdhi_fit <- linear_reg() %>%
@@ -64,7 +64,7 @@ feb_24h_ads_gdhi_fit <- linear_reg() %>%
 feb_24h_ads_gdhi_fit
 ```
 
-# Urban/Rural vs 24 hour Download Speed
+### Urban/Rural vs 24 hour Download Speed
 ```{r urbanrural-24h_download}
 feb_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
