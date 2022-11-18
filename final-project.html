@@ -299,23 +299,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -371,6 +365,7 @@ between two months in 2019</h1>
 <div id="load-required-packages" class="section level3">
 <h3>Load required packages</h3>
 <pre class="r"><code>library(tidyverse)
+library(tidymodels)
 library(janitor)
 library(geojsonio)</code></pre>
 </div>
@@ -397,9 +392,26 @@ gdhi_region &lt;- gdhi_region %&gt;%
   clean_names() %&gt;%
   drop_na() %&gt;%
   rename(&quot;region&quot; = &quot;countries_and_regions_of_the_uk&quot;) %&gt;%
-  mutate(region = regions)</code></pre>
+  mutate(region = regions,
+         gdhi_per_head = str_remove_all(gdhi_per_head, &quot;,&quot;),
+         gdhi_per_head = as.numeric(gdhi_per_head)
+         )</code></pre>
 <pre class="r"><code>region_map &lt;- geojson_read(&quot;uk_regions.geojson&quot;)</code></pre>
 </div>
+</div>
+<div id="houshold-income-vs-24-hour-download-speed" class="section level1">
+<h1>Houshold Income vs 24 hour Download Speed</h1>
+<pre class="r"><code>feb_gdhi_join &lt;- left_join(feb_2019, gdhi_region , by = &quot;region&quot;)
+feb_24h_ads_gdhi_fit &lt;- linear_reg() %&gt;%
+  set_engine(&quot;lm&quot;) %&gt;%
+  fit(x24_hr_average_download_speed ~ gdhi_per_head, data= feb_gdhi_join) %&gt;%
+  tidy()
+feb_24h_ads_gdhi_fit</code></pre>
+<pre><code>## # A tibble: 2 × 5
+##   term          estimate std.error statistic   p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   44.8     10.5           4.28 0.0000195
+## 2 gdhi_per_head  0.00108  0.000492      2.19 0.0284</code></pre>
 </div>
 
 
