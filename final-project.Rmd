@@ -11,6 +11,7 @@ date: "2022-11-16"
 ```{r load-packages, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(janitor)
+library(geojsonio)
 ```
 
 ### Read in data from csv files
