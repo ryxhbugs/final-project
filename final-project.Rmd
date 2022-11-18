@@ -1,7 +1,7 @@
 ---
-title: "Workshop 31/(? group number) Project"
+title: "Workshop Group 31/1 Project"
 output: html_document
-author: "Ryan Hall, Eddie Washbrook (add name here)"
+author: "Ryan Hall, Eddie Washbrook, Eric Rogers, (add name here)"
 date: "2022-11-16"
 ---
 # Do geographical location and characteristics have an effect on internet quality of life in the UK? An analysis of and comparison between two months in 2019
