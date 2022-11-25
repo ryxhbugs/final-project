@@ -452,23 +452,25 @@ feb_24h_ads_ur_fit</code></pre>
 <div id="main-data-analysis---set-seed-and-split---both-months" class="section level3">
 <h3>Main Data Analysis - Set Seed and Split - Both Months</h3>
 <pre class="r"><code>set.seed(1234)
-all_2019_split &lt;- initial_split(all_2019)
-all_2019_train &lt;- training(all_2019_split)
-all_2019_test &lt;- testing(all_2019_split)</code></pre>
-<p>======= ### All characteristics vs 24 hour Download Speed</p>
-<pre class="r"><code>feb_gdhi_join_rec &lt;- recipe(x24_hr_average_download_speed ~ ., data = feb_gdhi_join) %&gt;%
+all_gdhi_join_split &lt;- initial_split(all_gdhi_join)
+all_gdhi_join_train &lt;- training(all_gdhi_join_split)
+all_gdhi_join_test &lt;- testing(all_gdhi_join_split)</code></pre>
+</div>
+<div id="all-characteristics-vs-24-hour-download-speed" class="section level3">
+<h3>All characteristics vs 24 hour Download Speed</h3>
+<pre class="r"><code>all_gdhi_join_train_rec &lt;- recipe(x24_hr_average_download_speed ~ ., data = all_gdhi_join_train) %&gt;%
  step_select(x24_hr_average_download_speed, urban_rural, gdhi_per_head) %&gt;%
  step_dummy(all_nominal(), -all_outcomes()) 
 
-feb_24h_ads_all &lt;- linear_reg() %&gt;%
+all_gdhi_join_train_mod &lt;- linear_reg() %&gt;%
  set_engine(&#39;lm&#39;)
 
-feb_24h_ads_all_wflow &lt;- workflow() %&gt;% 
- add_model(feb_24h_ads_all) %&gt;% 
- add_recipe(feb_gdhi_join_rec)
+all_gdhi_join_train_wflow &lt;- workflow() %&gt;% 
+ add_model(all_gdhi_join_train_mod) %&gt;% 
+ add_recipe(all_gdhi_join_train_rec)
 
-feb_24h_ads_all_fit &lt;- feb_24h_ads_all_wflow %&gt;% 
- fit(data = feb_gdhi_join)</code></pre>
+all_gdhi_join_train_fit &lt;- all_gdhi_join_train_wflow %&gt;% 
+ fit(data = all_gdhi_join_train)</code></pre>
 </div>
 </div>
 

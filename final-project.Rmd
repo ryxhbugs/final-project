@@ -97,24 +97,24 @@ feb_24h_ads_ur_fit
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
 set.seed(1234)
-all_2019_split <- initial_split(all_2019)
-all_2019_train <- training(all_2019_split)
-all_2019_test <- testing(all_2019_split)
+all_gdhi_join_split <- initial_split(all_gdhi_join)
+all_gdhi_join_train <- training(all_gdhi_join_split)
+all_gdhi_join_test <- testing(all_gdhi_join_split)
 ```
-=======
-### All characteristics vs 24 hour Download Speed
+
+### All characteristics vs 24 hour Download Speed 
 ```{r variabls effect 24h-download }
-feb_gdhi_join_rec <- recipe(x24_hr_average_download_speed ~ ., data = feb_gdhi_join) %>%
+all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ ., data = all_gdhi_join_train) %>%
  step_select(x24_hr_average_download_speed, urban_rural, gdhi_per_head) %>%
  step_dummy(all_nominal(), -all_outcomes()) 
 
-feb_24h_ads_all <- linear_reg() %>%
+all_gdhi_join_train_mod <- linear_reg() %>%
  set_engine('lm')
 
-feb_24h_ads_all_wflow <- workflow() %>% 
- add_model(feb_24h_ads_all) %>% 
- add_recipe(feb_gdhi_join_rec)
+all_gdhi_join_train_wflow <- workflow() %>% 
+ add_model(all_gdhi_join_train_mod) %>% 
+ add_recipe(all_gdhi_join_train_rec)
 
-feb_24h_ads_all_fit <- feb_24h_ads_all_wflow %>% 
- fit(data = feb_gdhi_join)
+all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>% 
+ fit(data = all_gdhi_join_train)
 ```
