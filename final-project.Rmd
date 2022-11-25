@@ -50,7 +50,7 @@ gdhi_region <- gdhi_region %>%
 
 ```
 
-```{r maps, fig.height = 10, fig.width = 6}
+```{r maps, fig.height = 5, fig.width = 3.5}
 
 region_map <- geojson_read("uk_regions.geojson", what = "sp")
 
