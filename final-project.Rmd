@@ -65,6 +65,9 @@ ggplot() +
   geom_polygon(data = region_map, aes(x = long, y = lat, group = group), 
                fill = "white", colour = "grey", fig.width = 2) 
 
+avgs <- all_2019 %>%
+  group_by(region, month) %>%
+  summarise(mean_24hr = mean(x24_hr_average_download_speed))
 
 ```
 
