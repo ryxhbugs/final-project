@@ -72,3 +72,8 @@ feb_24h_ads_ur_fit <- linear_reg() %>%
   tidy()
 feb_24h_ads_ur_fit
 ```
+
+### All characteristics vs 24 hour Download Speed
+```{r variabls effect 24h-download }
+
+```
