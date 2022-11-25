@@ -106,12 +106,15 @@ all_2019_test <- testing(all_2019_split)
 ```{r variabls effect 24h-download }
 feb_gdhi_join_rec <- recipe(x24_hr_average_download_speed ~ ., data = feb_gdhi_join) %>%
  step_pca(x24_hr_average_download_speed, urban_rural, gdhi_per_head) %>%
- step_dummy(all_nominal(), -all_outcomes())
+ step_dummy(all_nominal(), -all_outcomes()) 
+
 feb_24h_ads_all <- logistic_reg() %>%
  set_engine('glm')
+
 feb_24h_ads_all_wflow <- workflow() %>% 
  add_model(feb_24h_ads_all) %>% 
  add_recipe(feb_gdhi_join_rec)
+
 feb_24h_ads_all_fit <- feb_24h_ads_all_wflow %>% 
  fit(data = feb_gdhi_join)
 ```
