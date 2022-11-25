@@ -71,21 +71,29 @@ avgs <- all_2019 %>%
 
 ```
 
-### Household Income vs 24 hour Download Speed
+### Household Income vs 24 hour Download Speed - Feb
 ```{r income-24h_download}
 feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
 feb_24h_ads_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(x24_hr_average_download_speed ~ gdhi_per_head, data= feb_gdhi_join) %>%
+  fit(x24_hr_average_download_speed ~ gdhi_per_head, data = feb_gdhi_join) %>%
   tidy()
 feb_24h_ads_gdhi_fit
 ```
 
-### Urban/Rural vs 24 hour Download Speed
+### Urban/Rural vs 24 hour Download Speed - Feb
 ```{r urbanrural-24h_download}
 feb_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(x24_hr_average_download_speed ~ urban_rural, data= feb_gdhi_join) %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data = feb_gdhi_join) %>%
   tidy()
 feb_24h_ads_ur_fit
+```
+
+### Main Data Analysis - Set Seed and Split - Both Months
+```{r setseed-split}
+set.seed(1234)
+all_2019_split <- initial_split(all_2019)
+all_2019_train <- training(all_2019_split)
+all_2019_test <- testing(all_2019_split)
 ```
