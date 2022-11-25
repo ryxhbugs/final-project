@@ -102,10 +102,9 @@ all_gdhi_join_train <- training(all_gdhi_join_split)
 all_gdhi_join_test <- testing(all_gdhi_join_split)
 ```
 
-### All characteristics vs 24 hour Download Speed 
-```{r variabls effect 24h-download }
-all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ ., data = all_gdhi_join_train) %>%
- step_select(x24_hr_average_download_speed, urban_rural, gdhi_per_head) %>%
+### Urban/Rual and GDHI vs 24 hour Download Speed - Model setup
+```{r variables effect 24h-download }
+all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join_train) %>%
  step_dummy(all_nominal(), -all_outcomes()) 
 
 all_gdhi_join_train_mod <- linear_reg() %>%
@@ -117,4 +116,12 @@ all_gdhi_join_train_wflow <- workflow() %>%
 
 all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>% 
  fit(data = all_gdhi_join_train)
+
+```
+
+### Predictions from Model Above
+```{r predictions_1}
+all_2019_24h_ads_predict <- predict(all_gdhi_join_train_fit, new_data = all_gdhi_join_test) %>%
+  bind_cols(all_gdhi_join_test %>% select(x24_hr_average_download_speed, urban_rural, gdhi_per_head))
+all_2019_24h_ads_predict
 ```

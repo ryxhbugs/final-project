@@ -456,10 +456,9 @@ all_gdhi_join_split &lt;- initial_split(all_gdhi_join)
 all_gdhi_join_train &lt;- training(all_gdhi_join_split)
 all_gdhi_join_test &lt;- testing(all_gdhi_join_split)</code></pre>
 </div>
-<div id="all-characteristics-vs-24-hour-download-speed" class="section level3">
-<h3>All characteristics vs 24 hour Download Speed</h3>
-<pre class="r"><code>all_gdhi_join_train_rec &lt;- recipe(x24_hr_average_download_speed ~ ., data = all_gdhi_join_train) %&gt;%
- step_select(x24_hr_average_download_speed, urban_rural, gdhi_per_head) %&gt;%
+<div id="urbanrual-and-gdhi-vs-24-hour-download-speed---model-setup" class="section level3">
+<h3>Urban/Rual and GDHI vs 24 hour Download Speed - Model setup</h3>
+<pre class="r"><code>all_gdhi_join_train_rec &lt;- recipe(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join_train) %&gt;%
  step_dummy(all_nominal(), -all_outcomes()) 
 
 all_gdhi_join_train_mod &lt;- linear_reg() %&gt;%
@@ -471,6 +470,26 @@ all_gdhi_join_train_wflow &lt;- workflow() %&gt;%
 
 all_gdhi_join_train_fit &lt;- all_gdhi_join_train_wflow %&gt;% 
  fit(data = all_gdhi_join_train)</code></pre>
+</div>
+<div id="predictions-from-model-above" class="section level3">
+<h3>Predictions from Model Above</h3>
+<pre class="r"><code>all_2019_24h_ads_predict &lt;- predict(all_gdhi_join_train_fit, new_data = all_gdhi_join_test) %&gt;%
+  bind_cols(all_gdhi_join_test %&gt;% select(x24_hr_average_download_speed, urban_rural, gdhi_per_head))
+all_2019_24h_ads_predict</code></pre>
+<pre><code>## # A tibble: 1,043 × 4
+##    .pred x24_hr_average_download_speed urban_rural gdhi_per_head
+##    &lt;dbl&gt;                         &lt;dbl&gt; &lt;chr&gt;               &lt;dbl&gt;
+##  1  84.7                         72.8  Urban               17331
+##  2  84.7                         40.0  Urban               17331
+##  3  86.8                         16.9  Urban               30256
+##  4  NA                          217.   Urban                  NA
+##  5  42.3                         70.9  Rural               18635
+##  6  42.0                         58.2  Rural               17331
+##  7  42.7                         69.7  Rural               21222
+##  8  42.0                          2.51 Rural               17263
+##  9  NA                           17.2  Urban                  NA
+## 10  86.8                         36.5  Urban               30256
+## # … with 1,033 more rows</code></pre>
 </div>
 </div>
 
