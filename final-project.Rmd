@@ -55,6 +55,11 @@ all_2019 <- feb_2019 %>%
   mutate(month = "February") %>%
   rbind(aug_2019_month)
 
+# Join datasets with gdhi_region set
+feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
+aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
+all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
+
 ```
 
 ```{r maps, fig.height = 5, fig.width = 3.5}
@@ -73,7 +78,6 @@ avgs <- all_2019 %>%
 
 ### Household Income vs 24 hour Download Speed - Feb
 ```{r income-24h_download}
-feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
 feb_24h_ads_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
   fit(x24_hr_average_download_speed ~ gdhi_per_head, data = feb_gdhi_join) %>%
@@ -90,7 +94,6 @@ feb_24h_ads_ur_fit <- linear_reg() %>%
 feb_24h_ads_ur_fit
 ```
 
-<<<<<<< HEAD
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
 set.seed(1234)
@@ -112,4 +115,3 @@ feb_24h_ads_all_wflow <- workflow() %>%
 feb_24h_ads_all_fit <- feb_24h_ads_all_wflow %>% 
  fit(data = feb_gdhi_join)
 ```
->>>>>>> 80b207c32133161e7932c1e26018f47bccd344e1
