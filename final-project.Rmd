@@ -48,6 +48,13 @@ gdhi_region <- gdhi_region %>%
          gdhi_per_head = as.numeric(gdhi_per_head)
          )
 
+aug_2019_month <- aug_2019 %>%
+  mutate(month = "August")
+
+all_2019 <- feb_2019 %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_month)
+
 ```
 
 ```{r maps, fig.height = 5, fig.width = 3.5}
@@ -57,6 +64,8 @@ region_map <- geojson_read("uk_regions.geojson", what = "sp")
 ggplot() +
   geom_polygon(data = region_map, aes(x = long, y = lat, group = group), 
                fill = "white", colour = "grey", fig.width = 2) 
+
+
 ```
 
 ### Household Income vs 24 hour Download Speed

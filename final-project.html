@@ -401,7 +401,14 @@ gdhi_region &lt;- gdhi_region %&gt;%
   mutate(region = regions,
          gdhi_per_head = str_remove_all(gdhi_per_head, &quot;,&quot;),
          gdhi_per_head = as.numeric(gdhi_per_head)
-         )</code></pre>
+         )
+
+aug_2019_month &lt;- aug_2019 %&gt;%
+  mutate(month = &quot;August&quot;)
+
+all_2019 &lt;- feb_2019 %&gt;%
+  mutate(month = &quot;February&quot;) %&gt;%
+  rbind(aug_2019_month)</code></pre>
 <pre class="r"><code>region_map &lt;- geojson_read(&quot;uk_regions.geojson&quot;, what = &quot;sp&quot;)
 
 ggplot() +
