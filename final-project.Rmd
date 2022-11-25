@@ -50,8 +50,13 @@ gdhi_region <- gdhi_region %>%
 
 ```
 
-```{r maps}
+```{r maps, fig.height = 10, fig.width = 6}
+
 region_map <- geojson_read("uk_regions.geojson", what = "sp")
+
+ggplot() +
+  geom_polygon(data = region_map, aes(x = long, y = lat, group = group), 
+               fill = "white", colour = "grey", fig.width = 2) 
 ```
 
 ### Household Income vs 24 hour Download Speed
