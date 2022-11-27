@@ -13,6 +13,7 @@ library(tidyverse)
 library(tidymodels)
 library(janitor)
 library(geojsonio)
+library(ggplot2)
 ```
 
 ### Read in data from csv files
@@ -85,6 +86,21 @@ feb_24h_ads_gdhi_fit <- linear_reg() %>%
 feb_24h_ads_gdhi_fit
 ```
 
+
+### residuals plot(Household Income vs 24 hour Download Speed - Feb)
+```{r residuals_plot_income-24h_download}
+feb_24h_ads_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ gdhi_per_head, data = feb_gdhi_join)
+feb_24h_ads_gdhi_fit_aug  <- augment(feb_24h_ads_gdhi_fit$fit)
+
+ggplot(feb_24h_ads_gdhi_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted x24_hr_average_download_speed", y = "Residuals")
+```
+
+
 ### Urban/Rural vs 24 hour Download Speed - Feb
 ```{r urbanrural-24h_download}
 feb_24h_ads_ur_fit <- linear_reg() %>%
@@ -93,6 +109,22 @@ feb_24h_ads_ur_fit <- linear_reg() %>%
   tidy()
 feb_24h_ads_ur_fit
 ```
+
+### residuals plot(Urban/Rural vs 24 hour Download Speed - Feb)
+```{r residuals_urbanrural-24h_download}
+feb_24h_ads_ur_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data = feb_gdhi_join)
+feb_24h_ads_ur_fit_aug  <- augment(feb_24h_ads_ur_fit$fit)
+
+ggplot(feb_24h_ads_ur_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted x24_hr_average_download_speed", y = "Residuals")
+```
+
+
+
 
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
