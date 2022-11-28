@@ -149,6 +149,7 @@ all_gdhi_join_train_wflow <- workflow() %>%
 all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>% 
  fit(data = all_gdhi_join_train)
 
+all_gdhi_join_train_fit
 ```
 
 ### Predictions from Model Above
