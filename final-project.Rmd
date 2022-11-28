@@ -87,7 +87,7 @@ feb_24h_ads_gdhi_fit
 ```
 
 
-### residuals plot(Household Income vs 24 hour Download Speed - Feb)
+### Residuals plot (Household Income vs 24 hour Download Speed - Feb)
 ```{r residuals_plot_income-24h_download}
 feb_24h_ads_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -110,7 +110,7 @@ feb_24h_ads_ur_fit <- linear_reg() %>%
 feb_24h_ads_ur_fit
 ```
 
-### residuals plot(Urban/Rural vs 24 hour Download Speed - Feb)
+### Residuals plot (Urban/Rural vs 24 hour Download Speed - Feb)
 ```{r residuals_urbanrural-24h_download}
 feb_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -134,7 +134,7 @@ all_gdhi_join_train <- training(all_gdhi_join_split)
 all_gdhi_join_test <- testing(all_gdhi_join_split)
 ```
 
-### Urban/Rual and GDHI vs 24 hour Download Speed - Model setup
+### Urban/Rural and GDHI vs 24 hour Download Speed - Model setup
 ```{r variables effect 24h-download }
 all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join_train) %>%
  step_dummy(all_nominal(), -all_outcomes()) 

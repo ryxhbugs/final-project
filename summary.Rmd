@@ -6,9 +6,9 @@ output: html_document
 
 ## Research Question
 
-Describe your research question here. Include why this question might be of interest. 
+Our research question is the following: "Do geographical location and characteristics have an effect on internet quality of life in the UK?". 
 
-Our research question is the following: "Do geographical location and characteristics have an effect on internet quality of life in the UK?". Internet quality of life is becoming more important than ever - especially with how increasingly online our world is becoming. We aim to examine the relationships between geographical location of UK internet users (and related metrics such as household income) and metrics which can help us gain a picture of internet quality of life, such as download speed.
+Internet quality of life is becoming more important than ever - especially with how increasingly online our world is becoming. We aim to examine the relationships between geographical location of UK internet users (and related metrics such as household income) and metrics which can help us gain a picture of internet quality of life, such as download speed. We will also consider how things have changed over the course of two months at different points in the year.
 
 ## Data
 
@@ -16,6 +16,12 @@ Briefly describe your dataset here - include a description of the key variables 
 Include a citation for your data. 
 See http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840 for guidance on proper citation for datasets. 
 If you got your data off the web, make sure to note the retrieval date.
+
+For our project we used 3 datasets in total, 2 from data.gov.ukm, and one from ons.gov.uk. The first two datasets concern fixed line broadband speeds in the UK in February and August 2019, respectively. Both datasets come from Ofcom, the UK's communications regulator. The broadband data was collected from a sample of customers who had speed monitoring equipment stored in their homes.
+
+The third data contains information on the GDHI (Gross Disposable Household Income) for UK consituent countries and regions.
+
+For the purposes of our project, we will be mainly focusing on 24 hour average download speed, Urban/Rural (whether or not a reading comes from an urban or rural location) and GDHI per head.
 
 ## Findings
 
@@ -48,4 +54,8 @@ Our presentation can be found [here](presentation/presentation.html).
 ## References
 
 List any references here. You should, at a minimum, list your data source.
+
+https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
+
+https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
 
