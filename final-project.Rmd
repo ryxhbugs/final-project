@@ -16,7 +16,7 @@ library(geojsonio)
 library(ggplot2)
 ```
 
-### Read in data from csv files
+### Read in data from .csv files
 
 ```{r load-data, message = FALSE}
 

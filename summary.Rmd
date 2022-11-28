@@ -1,12 +1,14 @@
 ---
-title: Project title
-author: by Team name
+title: Geographical Location and Internet Quality of Life
+author: by Workshop Group 31/1
 output: html_document
 ---
 
 ## Research Question
 
 Describe your research question here. Include why this question might be of interest. 
+
+Our research question is the following: "Do geographical location and characteristics have an effect on internet quality of life in the UK?". Internet quality of life is becoming more important than ever - especially with how increasingly online our world is becoming. We aim to examine the relationships between geographical location of UK internet users (and related metrics such as household income) and metrics which can help us gain a picture of internet quality of life, such as download speed.
 
 ## Data
 
