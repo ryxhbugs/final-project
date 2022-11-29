@@ -145,7 +145,32 @@ feb_2019_ju_ads_fit_aug  <- augment(feb_2019_ju_ads_fit$fit)
 ggplot(feb_2019_ju_ads_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "x24_hour_jitter_upstream", y = "Residuals")
+  labs(x = "Predicted x24_hour_jitter_upstream", y = "Residuals")
+```
+
+
+### jitter_downstrem VS ads
+```{r jitter_downstrem VS ads}
+feb_2019_jd_ads_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_jitter_downstream ~ x24_hr_average_download_speed, data = feb_2019) %>%
+  tidy()
+feb_2019_jd_ads_fit
+```
+
+
+
+### residual plot(jitter_downstrem VS ads)
+```{r residual plot(jitter_downstrem VS ads)}
+feb_2019_jd_ads_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_jitter_downstream ~ x24_hr_average_download_speed, data = feb_2019)
+feb_2019_jd_ads_fit_aug  <- augment(feb_2019_jd_ads_fit$fit)
+
+ggplot(feb_2019_jd_ads_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted x24_hour_jitter_downstream", y = "Residuals")
 ```
 
 
