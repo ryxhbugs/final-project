@@ -197,6 +197,83 @@ ggplot(feb_2019_ads_latency_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   labs(x = "Predicted x24_hr_average_download_speed", y = "Residuals")
 ```
 
+
+### ads VS dfe
+```{r ads VS dfe}
+feb_2019_dfe <- feb_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "50",
+      distance_from_exchange == "101 to 200m" ~ "150",
+      distance_from_exchange == "201 to 300m" ~ "250",
+      distance_from_exchange == "301 to 400m" ~ "350",
+      distance_from_exchange == "401 to 500m" ~ "450",
+      distance_from_exchange == "501 to 600m" ~ "550",
+      distance_from_exchange == "601 to 700m" ~ "650",
+      distance_from_exchange == "701 to 800m" ~ "750",
+      distance_from_exchange == "801 to 900m" ~ "850",
+      distance_from_exchange == "901 to 1000m" ~ "950",
+      distance_from_exchange == "1001 to 1100m" ~ "1050",
+      distance_from_exchange == "1101 to 1200m" ~ "1150",
+      distance_from_exchange == "1201 to 1300m" ~ "1250",
+      distance_from_exchange == "1301 to 1400m" ~ "1350",
+      distance_from_exchange == "1401 to 1500m" ~ "1450",
+      distance_from_exchange == "1501 to 1600m" ~ "1550",
+      distance_from_exchange == "1601 to 1700m" ~ "1650",
+      distance_from_exchange == "1701 to 1800m" ~ "1750",
+      distance_from_exchange == "1801 to 1900m" ~ "1850",
+      distance_from_exchange == "1901 to 2000m" ~ "1950",
+      distance_from_exchange == "2001 to 2100m" ~ "2050",
+      distance_from_exchange == "2101 to 2200m" ~ "2150",
+      distance_from_exchange == "2201 to 2300m" ~ "2250",
+      distance_from_exchange == "2301 to 2400m" ~ "2350",
+      distance_from_exchange == "2401 to 2500m" ~ "2450",
+      distance_from_exchange == "2501 to 2600m" ~ "2550",
+      distance_from_exchange == "2601 to 2700m" ~ "2650",
+      distance_from_exchange == "2701 to 2800m" ~ "2750",
+      distance_from_exchange == "2801 to 2900m" ~ "2850",
+      distance_from_exchange == "2901 to 3000m" ~ "2950",
+      distance_from_exchange == "3001 to 3250m" ~ "3125",
+      distance_from_exchange == "3251 to 3500m" ~ "3375",
+      distance_from_exchange == "3501 to 3750m" ~ "3625",
+      distance_from_exchange == "3751 to 4000m" ~ "3875",
+      distance_from_exchange == "4001 to 4500m" ~ "4250",
+      distance_from_exchange == "4501 to 5000m" ~ "4750",
+      distance_from_exchange == "5001 to 5500m" ~ "5250",
+      distance_from_exchange == "Over 5500m" ~ "5500"
+    ))
+
+feb_2019_dfe$distance_from_exchange <- as.numeric(as.character(feb_2019_dfe$distance_from_exchange))
+
+feb_2019_ads_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hr_average_download_speed) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ads = mean(x24_hr_average_download_speed)
+  )
+
+feb_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = feb_2019_ads_dfe) %>%
+  tidy()
+feb_2019_ads_dfe_fit
+```
+
+
+### residual plot(ads VS dfe)
+```{r residual plot(ads VS dfe)}
+feb_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = feb_2019_ads_dfe)
+feb_2019_ads_dfe_fit_aug  <- augment(feb_2019_ads_dfe_fit$fit)
+
+ggplot(feb_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ads", y = "Residuals")
+```
+
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
 set.seed(1234)
