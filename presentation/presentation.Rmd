@@ -1,7 +1,7 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle (if any)"
-author: "Team name <br> Names of team members"
+title: "Geographical Location and Internet Quality of Life"
+subtitle: "IDS 2022 - Workshop Group 31/1 Project"
+author: "Team Members - Zhihong Chen, Ryan Hall, Chenyi He, Eric Rogers, Eddie Washbrook"
 institute: "University of Edinburgh"
 date: "`r Sys.Date()`"
 output:

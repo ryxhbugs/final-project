@@ -410,5 +410,5 @@ all_gdhi_join_train_fit
 ```{r predictions_1}
 all_2019_24h_ads_predict <- predict(all_gdhi_join_train_fit, new_data = all_gdhi_join_test) %>%
   bind_cols(all_gdhi_join_test %>% select(x24_hr_average_download_speed, urban_rural, gdhi_per_head))
-all_2019_24h_ads_predict
+all_2019_24h_ads_predict 
 ```
