@@ -1,7 +1,7 @@
 ---
 title: "Workshop Group 31/1 Project"
 output: html_document
-author: "Ryan Hall, Eddie Washbrook, Eric Rogers, Chenyi He, (add name here)"
+author: "Ryan Hall, Eddie Washbrook, Eric Rogers, Chenyi He, Zhihong Chen"
 date: "2022-11-16"
 ---
 # Do geographical location and characteristics have an effect on internet quality of life in the UK? An analysis of and comparison between two months in 2019
@@ -303,6 +303,37 @@ ggplot(feb_2019_ju_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
   labs(x = "Predicted avg_ju", y = "Residuals")
+```
+
+
+### (feb) jitter downstream VS dfe
+```{r jitter downstream VS dfe}
+feb_2019_jd_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_downstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_jd = mean(x24_hour_jitter_downstream)
+  )
+
+feb_2019_jd_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_jd ~ distance_from_exchange, data = feb_2019_jd_dfe) %>%
+  tidy()
+feb_2019_jd_dfe_fit
+```
+
+
+### (feb)residual plot(jitter downstream VS dfe)
+```{r residual plot(jitter downstream VS dfe)}
+feb_2019_jd_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_jd ~ distance_from_exchange, data = feb_2019_jd_dfe)
+feb_2019_jd_dfe_fit_aug  <- augment(feb_2019_jd_dfe_fit$fit)
+
+ggplot(feb_2019_jd_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_jd", y = "Residuals")
 ```
 
 
