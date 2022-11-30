@@ -274,6 +274,38 @@ ggplot(feb_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   labs(x = "Predicted avg_ads", y = "Residuals")
 ```
 
+
+### (feb) jitter upstream VS dfe
+```{r jitter upstream VS dfe}
+feb_2019_ju_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_upstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ju = mean(x24_hour_jitter_upstream)
+  )
+
+feb_2019_ju_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ju ~ distance_from_exchange, data = feb_2019_ju_dfe) %>%
+  tidy()
+feb_2019_ju_dfe_fit
+```
+
+
+### (feb)residual plot(jitter upstream VS dfe)
+```{r residual plot(jitter upstream VS dfe)}
+feb_2019_ju_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ju ~ distance_from_exchange, data = feb_2019_ju_dfe)
+feb_2019_ju_dfe_fit_aug  <- augment(feb_2019_ju_dfe_fit$fit)
+
+ggplot(feb_2019_ju_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ju", y = "Residuals")
+```
+
+
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
 set.seed(1234)
