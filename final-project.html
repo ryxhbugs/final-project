@@ -823,7 +823,7 @@ all_gdhi_join_train_fit</code></pre>
 <h3>Predictions from Model Above</h3>
 <pre class="r"><code>all_2019_24h_ads_predict &lt;- predict(all_gdhi_join_train_fit, new_data = all_gdhi_join_test) %&gt;%
   bind_cols(all_gdhi_join_test %&gt;% select(x24_hr_average_download_speed, urban_rural, gdhi_per_head))
-all_2019_24h_ads_predict</code></pre>
+all_2019_24h_ads_predict </code></pre>
 <pre><code>## # A tibble: 1,043 × 4
 ##    .pred x24_hr_average_download_speed urban_rural gdhi_per_head
 ##    &lt;dbl&gt;                         &lt;dbl&gt; &lt;chr&gt;               &lt;dbl&gt;
