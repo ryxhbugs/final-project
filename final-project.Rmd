@@ -78,6 +78,7 @@ avgs <- all_2019 %>%
 
 ```
 
+
 ### Household Income vs 24 hour Download Speed - Feb
 ```{r income-24h_download}
 feb_24h_ads_gdhi_fit <- linear_reg() %>%
@@ -86,7 +87,6 @@ feb_24h_ads_gdhi_fit <- linear_reg() %>%
   tidy()
 feb_24h_ads_gdhi_fit
 ```
-
 
 ### (USELESS)Residuals plot (Household Income vs 24 hour Download Speed - Feb)
 ```{r residuals_plot_income-24h_download}
@@ -336,7 +336,50 @@ ggplot(feb_2019_jd_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   labs(x = "Predicted avg_jd", y = "Residuals")
 ```
 
+### All Months - predicting ADS from GDHI
+```{r gdhi-24h_download-all}
+all_24h_ads_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_gdhi_fit
+```
 
+### All Months - predicting ADS from Urban / Rural
+```{r urbanrural-24h_download-all}
+all_24h_ads_region_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_region_fit
+```
+### All Months - predicting ADS fom both GDHI and Urban / Rural
+```{r both-24h_download-all}
+all_24h_ads_both_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_both_fit
+```
+
+### Trying log model with GDHI
+
+```{r log-gdhi-24h_download-all}
+all_24h_ads_gdhi_fit_log <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(log(x24_hr_average_download_speed) ~ gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_gdhi_fit_log
+```
+
+### All Months - predicting ADS from UK Region
+```{r region-24h_download-all}
+all_24h_ads_region_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ region, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_region_fit
+```
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
 set.seed(1234)
