@@ -198,7 +198,7 @@ ggplot(feb_2019_ads_latency_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 
-### ads VS dfe
+### (feb)ads VS dfe
 ```{r ads VS dfe}
 feb_2019_dfe <- feb_2019 %>%
   drop_na() %>%
@@ -261,7 +261,7 @@ feb_2019_ads_dfe_fit
 ```
 
 
-### residual plot(ads VS dfe)
+### (feb)residual plot(ads VS dfe)
 ```{r residual plot(ads VS dfe)}
 feb_2019_ads_dfe_fit <- linear_reg() %>%
   set_engine("lm") %>%
