@@ -1,6 +1,6 @@
 ---
-title: "Presentation title"
-subtitle: "IDS 2022 - Group Project Presentation"
+title: "Geographical Location and Internet Quality of Life"
+subtitle: "IDS 2022 - Workshop Group 31/1 Project"
 author: "Team Members - Zhihong Chen, Ryan Hall, Chenyi He, Eric Rogers, Eddie Washbrook"
 institute: "University of Edinburgh"
 date: "`r Sys.Date()`"
