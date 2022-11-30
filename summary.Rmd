@@ -28,8 +28,11 @@ For the purposes of our project, we will be mainly focusing on 24 hour average d
 The write-up of your project and findings go here. 
 Think of this as the text of your presentation with some extra detail to cover what there was not time to discuss in the presentation. 
 
-assumptions:
-limitations:
+comparison of feb and aug -> improvement in internet quality
+linear model: urbanrural/region/ghdi -> effect ads/jitter/packet loss
+prediction: p-value of ads
+assumptions: 
+limitations: 
 ideas for future work:
 
 You can also load your data here and present any analysis results / plots.
