@@ -380,6 +380,7 @@ all_24h_ads_region_fit <- linear_reg() %>%
   tidy()
 all_24h_ads_region_fit
 ```
+
 ### Main Data Analysis - Set Seed and Split - Both Months
 ```{r setseed-split}
 set.seed(1234)
@@ -404,6 +405,7 @@ all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>%
  fit(data = all_gdhi_join_train)
 
 all_gdhi_join_train_fit
+glance(all_gdhi_join_train_fit)$adj.r.squared
 ```
 
 ### Predictions from Model Above
