@@ -99,6 +99,9 @@ class_aug <- cut(aug_joined$mean_24hr, 9)
 col_aug <- reds[as.numeric(class_aug)]
 plot(aug_joined, col = col_aug)
 
+gdhi_joined <- region_map %>%
+  geo_join(gdhi_region, by = "region", how = "left")
+
 ```
 
 
