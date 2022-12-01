@@ -91,6 +91,12 @@ aug_joined <- region_map %>%
 reds <- brewer.pal(9, "Reds")
 blues <- brewer.pal(9, "Blues")
 
+class_feb <- cut(feb_joined$mean_24hr, 9)
+col_feb <- reds[as.numeric(class_feb)]
+
+class_aug <- cut(aug_joined$mean_24hr, 9)
+col_aug <- blues[as.numeric(class_aug)]
+
 ```
 
 
