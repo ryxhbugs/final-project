@@ -625,6 +625,31 @@ ggplot(aug_2019_pl_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   labs(x = "Predicted avg_pl", y = "Residuals")
 ```
 
+
+### (all) time to load webpage VS ads, latency and packet loss
+```{r (all)time to load webpage VS ads, latency and packet loss}
+all_2019_tlb_fit <- linear_reg() %>%
+  set_engine("glm") %>%
+  fit(log(x24_hour_time_to_load_webpage) ~ x24_hr_average_download_speed + x24_hour_latency + x24_hour_packet_loss, data = all_2019) %>%
+  tidy()
+all_2019_tlb_fit
+```
+
+
+### (all)residual plot(time to load webpage VS ads, latency and packet loss)
+```{r (all)residual plot(time to load webpage VS ads, latency and packet loss)}
+all_2019_tlb_fit <- linear_reg() %>%
+  set_engine("glm") %>%
+  fit(log(x24_hour_time_to_load_webpage) ~ x24_hr_average_download_speed + x24_hour_latency + x24_hour_packet_loss, data = all_2019)
+all_2019_tlb_fit_aug  <- augment(all_2019_tlb_fit$fit)
+
+ggplot(all_2019_tlb_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted log", y = "Residuals")
+```
+
+
 ### All Months - predicting ADS from GDHI
 ```{r gdhi-24h_download-all}
 all_24h_ads_gdhi_fit <- linear_reg() %>%
