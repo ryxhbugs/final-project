@@ -17,6 +17,7 @@ library(ggplot2)
 library(dplyr)
 library(spdplyr)
 library(tigris)
+library(RColorBrewer)
 ```
 
 ### Read in data from .csv files
@@ -86,6 +87,9 @@ aug_avg <- aug_2019 %>%
 
 aug_joined <- region_map %>%
   geo_join(aug_avg, by = "region", how = "left")
+
+reds <- brewer.pal(9, "Reds")
+blues <- brewer.pal(9, "Blues")
 
 ```
 

@@ -377,7 +377,8 @@ library(geojsonio)
 library(ggplot2)
 library(dplyr)
 library(spdplyr)
-library(tigris)</code></pre>
+library(tigris)
+library(RColorBrewer)</code></pre>
 </div>
 <div id="read-in-data-from-.csv-files" class="section level3">
 <h3>Read in data from .csv files</h3>
@@ -436,7 +437,10 @@ aug_avg &lt;- aug_2019 %&gt;%
   summarise(mean_24hr = mean(x24_hr_average_download_speed))
 
 aug_joined &lt;- region_map %&gt;%
-  geo_join(aug_avg, by = &quot;region&quot;, how = &quot;left&quot;)</code></pre>
+  geo_join(aug_avg, by = &quot;region&quot;, how = &quot;left&quot;)
+
+reds &lt;- brewer.pal(9, &quot;Reds&quot;)
+blues &lt;- brewer.pal(9, &quot;Blues&quot;)</code></pre>
 </div>
 <div id="household-income-vs-24-hour-download-speed---feb" class="section level3">
 <h3>Household Income vs 24 hour Download Speed - Feb</h3>
