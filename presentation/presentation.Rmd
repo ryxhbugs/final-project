@@ -67,8 +67,7 @@ Ryan
 
 # Linear Modelling
 
-Chenyi
-
+How GDHI per head effects IQOL:
 ```{r income-24h_download, echo = FALSE}
 # Predicting 24 hour average download speed from GDHI per head
 all_24h_ads_gdhi_fit <- linear_reg() %>%
@@ -77,7 +76,6 @@ all_24h_ads_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_ads_gdhi_fit
 ```
-
 ```{r income-24h_packetloss, echo = FALSE}
 # Predicting 24 hour packet loss from GDHI per head
 all_24h_pl_gdhi_fit <- linear_reg() %>%
@@ -86,8 +84,7 @@ all_24h_pl_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_pl_gdhi_fit
 ```
-
-```{r income-24h_packetloss, echo = FALSE}
+```{r income-24h_latency, echo = FALSE}
 # Predicting 24 hour latency from GDHI per head
 all_24h_ltcy_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -95,7 +92,6 @@ all_24h_ltcy_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_ltcy_gdhi_fit
 ```
-
 ```{r income-24h_netflixstartupdelay, echo = FALSE}
 # Predicting 24 hour netflix startup delay from GDHI per head
 all_24h_nsud_gdhi_fit <- linear_reg() %>%
@@ -104,7 +100,7 @@ all_24h_nsud_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_nsud_gdhi_fit
 ```
-
+How living in urban or rural area effects IQOL:
 ```{r urbanrural-24h_download, echo = FALSE}
 all_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -112,7 +108,31 @@ all_24h_ads_ur_fit <- linear_reg() %>%
   tidy()
 all_24h_ads_ur_fit
 ```
-
+```{r ur-24h_packetloss, echo = FALSE}
+# Predicting 24 hour packet loss from GDHI per head
+all_24h_pl_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_packet_loss ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_pl_gdhi_fit
+```
+```{r ur-24h_latency, echo = FALSE}
+# Predicting 24 hour latency from GDHI per head
+all_24h_pl_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_latency ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_pl_gdhi_fit
+```
+```{r ur-24h_netflixstartupdelay, echo = FALSE}
+# Predicting 24 hour netflix startup delay from GDHI per head
+all_24h_nsud_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_netflix_start_up_delay ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_nsud_gdhi_fit
+```
+A tiny change from Feburary to August:
 ```{r urbanrural-24h_download-feb, echo = FALSE}
 feb_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -128,23 +148,7 @@ aug_24h_ads_ur_fit <- linear_reg() %>%
 aug_24h_ads_ur_fit
 ```
 
-```{r ur-24h_packetloss, echo = FALSE}
-# Predicting 24 hour packet loss from GDHI per head
-all_24h_pl_gdhi_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hour_packet_loss ~ urban_rural, data = all_gdhi_join) %>%
-  tidy()
-all_24h_pl_gdhi_fit
-```
 
-```{r ur-24h_netflixstartupdelay, echo = FALSE}
-# Predicting 24 hour netflix startup delay from GDHI per head
-all_24h_nsud_gdhi_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hour_netflix_start_up_delay ~ urban_rural, data = all_gdhi_join) %>%
-  tidy()
-all_24h_nsud_gdhi_fit
-```
 ---
 
 # Model Accuracy - Residual Plots
