@@ -1,0 +1,178 @@
+---
+title: "Workshop Group 31/1 Project"
+output: html_document
+author: "Ryan Hall, Eddie Washbrook, Eric Rogers, Chenyi He, Zhihong Chen"
+date: "2022-11-16"
+---
+# Do geographical location and characteristics have an effect on internet quality of life in the UK? An analysis of and comparison between two months in 2019
+
+```{r all-prep, message = FALSE, warning = FALSE, echo = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(janitor)
+library(geojsonio)
+library(ggplot2)
+library(dplyr)
+
+feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
+aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
+gdhi_region <- read.csv("data/gdhi_per_region.csv", skip = 1)
+
+feb_2019 <- feb_2019 %>%
+  clean_names() %>%
+  select(-ofcom_product) %>%    # These steps are to make the columns match the August dataset.
+  rename("distance_from_exchange" = "distance_from_exchange_band")
+  
+aug_2019 <- aug_2019 %>%
+  clean_names()
+
+regions <- c("United Kingdom", "England", "North East", "North West", "Yorkshire & Humber", "East Midlands", 
+             "West Midlands", "East", "London", "South East", "South West", "Wales", "Scotland", "Northern Ireland")
+
+gdhi_region <- gdhi_region %>%
+  clean_names() %>%
+  drop_na() %>%
+  rename("region" = "countries_and_regions_of_the_uk") %>%
+  mutate(region = regions,
+         gdhi_per_head = str_remove_all(gdhi_per_head, ","),
+         gdhi_per_head = as.numeric(gdhi_per_head)
+         )
+
+aug_2019_month <- aug_2019 %>%
+  mutate(month = "August")
+
+all_2019 <- feb_2019 %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_month)
+
+# Join datasets with gdhi_region set
+feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
+aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
+all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
+
+```
+### Eric - Writeup Section (sources linked below to cite)
+
+To examine relationships between different variables in our dataset (variables which relate to location and internet quality of life, or IQOL) we experimented with fitting various linear models to our data. We started by looking primarily at investigating the link between the variables household income (GDHI per head, where GDHI stands for Gross Domestic Household Income), and Urban/Rural (whether a broadband customer lived in an urban or rural location), and internet quality of life indicators. We focused first on 24 hour average download speed, but then moved on to look at other variables such as packet loss and Netflix start up delay. Packet loss is when is when data packets sent over the internet fail to reach their destination (1), and this manifests itself in network disruption and slow service, which we felt were key when determining internet quality. We also focused on Netflix startup delay - given the rising popularity of internet streaming services, and the fact that Netflix is the most popular in the UK (2). A household with good internet quality of life would have high download speeds, lower packet loss, minimal startup delays, etc.
+
+We plotted the following linear regression models using GDHI as a single predictor for 24 hour download speed, packet loss and Netflix start up delay:
+
+```{r income-24h_download, echo = FALSE}
+# Predicting 24 hour average download speed from GDHI per head
+all_24h_ads_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_gdhi_fit
+```
+
+```{r income-24h_packetloss, echo = FALSE}
+# Predicting 24 hour packet loss from GDHI per head
+all_24h_pl_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_packet_loss ~ gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_pl_gdhi_fit
+```
+
+```{r income-24h_netflixstartupdelay, echo = FALSE}
+# Predicting 24 hour netflix startup delay from GDHI per head
+all_24h_nsud_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_netflix_start_up_delay ~ gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_nsud_gdhi_fit
+```
+
+Here we see that increased GDHI is linked to increased IQOL, with the model estimating that households with higher GDHI per head will have higher download speeds, less packet loss and lower Netflix start up delays. Note that the coefficients are comparatively small - in context, an average household in Yorkshire & Humber would have an estimated 24 hour download speed of approximately 65.3Mbps, compared to a household in London which we could estimate a speed of 81.3Mbps for (they have GDHI per head values of £17959 and £30256 respectively according to the dataset).
+
+Next we looked at predicting 24 hour download speed from Urban/Rural:
+```{r urbanrural-24h_download, echo = FALSE}
+all_24h_ads_ur_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ads_ur_fit
+```
+We can compare this to see how this has changed from February to August:
+```{r urbanrural-24h_download-feb, echo = FALSE}
+feb_24h_ads_ur_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data = feb_gdhi_join) %>%
+  tidy()
+feb_24h_ads_ur_fit
+```
+```{r urbanrural-24h_download-aug, echo = FALSE}
+aug_24h_ads_ur_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hr_average_download_speed ~ urban_rural, data = aug_gdhi_join) %>%
+  tidy()
+aug_24h_ads_ur_fit
+```
+
+Here we see that on average, households in rural locations are worse off in terms of broadband speed - with urban locations having speeds around twice as fast as rural households (not taking into account region or income, etc.).
+
+We can also try predicting packet loss and Netflix start up delay from the Urban/Rural variable as well for both years combined - results are below.
+```{r ur-24h_packetloss, echo = FALSE}
+# Predicting 24 hour packet loss from GDHI per head
+all_24h_pl_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_packet_loss ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_pl_gdhi_fit
+```
+
+```{r ur-24h_netflixstartupdelay, echo = FALSE}
+# Predicting 24 hour netflix startup delay from GDHI per head
+all_24h_nsud_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_netflix_start_up_delay ~ urban_rural, data = all_gdhi_join) %>%
+  tidy()
+all_24h_nsud_gdhi_fit
+```
+This data supports the idea that Urban households have better internet quality of life - we see lower packet loss and lower startup delays on average for Urban households (again, not taking into account location / GDHI, etc.)
+
+Finally we decided to see if we could predict 24 hour download speed based off of the variables of GDHI per head and Urban/Rural. The data was split with 75% of observations in the training set, and 25% in the testing set. We can see a snapshot of the results of the model below, compared to the actual values:
+
+```{r setseed-split, echo=FALSE}
+set.seed(1234)
+all_gdhi_join_split <- initial_split(all_gdhi_join)
+all_gdhi_join_train <- training(all_gdhi_join_split)
+all_gdhi_join_test <- testing(all_gdhi_join_split)
+```
+```{r variables effect 24h-download, echo=FALSE }
+all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join_train) %>%
+ step_dummy(all_nominal(), -all_outcomes()) 
+
+all_gdhi_join_train_mod <- linear_reg() %>%
+ set_engine('lm')
+
+all_gdhi_join_train_wflow <- workflow() %>% 
+ add_model(all_gdhi_join_train_mod) %>% 
+ add_recipe(all_gdhi_join_train_rec)
+
+all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>% 
+ fit(data = all_gdhi_join_train)
+
+all_gdhi_join_train_fit
+```
+```{r predictions_1, echo=FALSE}
+all_2019_24h_ads_predict <- predict(all_gdhi_join_train_fit, new_data = all_gdhi_join_test) %>%
+  bind_cols(all_gdhi_join_test %>% select(x24_hr_average_download_speed, urban_rural, gdhi_per_head))
+all_2019_24h_ads_predict 
+```
+
+We can also see the adjusted R squared value for the model below:
+```{r modelrsquared, echo=FALSE}
+glance(all_gdhi_join_train_fit)$adj.r.squared
+```
+Here we get a value of 7.5%, which is quite low, suggesting that the model is not very good at predicting average download speed, as it does a poor job of predicting the test set data.
+Sources:
+(1) https://www.forcepoint.com/cyber-edu/packet-loss
+(2) https://www.finder.com/uk/tv-streaming-statistics
+
+### Overall Findings Bit - use this if you want / feel free to edit
+
+### Limitations of our dataset - try work this in if you can
+
+One of the key limitations of our data was the fact that GDHI was given to us only by region. This made it difficult to compare households in the same areas which had different incomes - i.e. high income rural households vs low income rural households. As a result we were not able to see whether different incomes in areas affected the broadband speed that customers could obtain.
