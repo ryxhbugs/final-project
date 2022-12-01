@@ -16,6 +16,7 @@ library(geojsonio)
 library(ggplot2)
 library(dplyr)
 library(spdplyr)
+library(tigris)
 ```
 
 ### Read in data from .csv files
@@ -65,18 +66,26 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 ```
 
-```{r maps, fig.height = 5, fig.width = 3.5}
+
+### Maps of regional variation
+```{r maps, fig.height = 5, fig.width = 3.5, warning = FALSE}
 
 region_map <- geojson_read("uk_regions.geojson", what = "sp") %>%
   rename(region = rgn19nm)
 
-ggplot() +
-  geom_polygon(data = region_map, aes(x = long, y = lat, group = group), 
-               fill = "white", colour = "grey", fig.width = 2) 
-
-avgs <- all_2019 %>%
-  group_by(region, month) %>%
+feb_avg <- feb_2019 %>%
+  group_by(region) %>%
   summarise(mean_24hr = mean(x24_hr_average_download_speed))
+
+feb_joined <- region_map %>%
+  geo_join(feb_avg, by = "region", how = "left")
+
+aug_avg <- aug_2019 %>%
+  group_by(region) %>%
+  summarise(mean_24hr = mean(x24_hr_average_download_speed))
+
+aug_joined <- region_map %>%
+  geo_join(aug_avg, by = "region", how = "left")
 
 ```
 
