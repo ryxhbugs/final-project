@@ -77,12 +77,6 @@ Zhihong
 
 ---
 
-# Model Accuracy - Residual Plots
-
-Zhihong
-
----
-
 # Model Training and Prediction
 
  - Some predicted values were similar to the observed
