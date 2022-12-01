@@ -109,6 +109,13 @@ col_gdhi <- blues[as.numeric(class_gdhi)]
 plot(gdhi_joined, col = col_gdhi, main = "Gross disposable household income per region in the UK, 2019", 
      sub = "Data from ons.gov.uk")
 
+disparity <- feb_2019 %>%
+  group_by(region, urban_rural) %>%
+  summarise(avg_24hr = mean(x24_hr_average_download_speed)) %>%
+  pivot_wider(names_from = urban_rural, values_from = avg_24hr) %>%
+  mutate(ratio = Urban/Rural)
+  
+disparity$ratio <- replace_na(disparity$ratio, 1)
 ```
 
 
