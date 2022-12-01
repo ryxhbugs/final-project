@@ -69,7 +69,7 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 
 ### Maps of regional variation
-```{r maps, fig.height = 5, fig.width = 3.5, warning = FALSE}
+```{r maps, fig.height = 5, fig.width = 10, warning = FALSE}
 
 region_map <- geojson_read("uk_regions.geojson", what = "sp") %>%
   rename(region = rgn19nm)
@@ -93,18 +93,21 @@ blues <- brewer.pal(9, "Blues")
 
 class_feb <- cut(feb_joined$mean_24hr, 9)
 col_feb <- reds[as.numeric(class_feb)]
-plot(feb_joined, col = col_feb)
+plot(feb_joined, col = col_feb, main = "UK 24 hour average broadband speed by region, February 2019",
+     sub = "Data from data.gov.uk")
 
 class_aug <- cut(aug_joined$mean_24hr, 9)
 col_aug <- reds[as.numeric(class_aug)]
-plot(aug_joined, col = col_aug)
+plot(aug_joined, col = col_aug, main = "UK 24 hour average broadband speed by region, August 2019",
+     sub = "Data from data.gov.uk")
 
 gdhi_joined <- region_map %>%
   geo_join(gdhi_region, by = "region", how = "left")
 
 class_gdhi <- cut(gdhi_joined$gdhi_per_head, 9)
 col_gdhi <- blues[as.numeric(class_gdhi)]
-plot(gdhi_joined, col = col_gdhi)
+plot(gdhi_joined, col = col_gdhi, main = "Gross disposable household income per region in the UK, 2019", 
+     sub = "Data from ons.gov.uk")
 
 ```
 
