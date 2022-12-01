@@ -67,7 +67,7 @@ Ryan
 
 # Linear Modelling
 
-How GDHI per head effects IQOL:
+How does GDHI per head affect IQOL:
 ```{r income-24h_download, echo = FALSE}
 # Predicting 24 hour average download speed from GDHI per head
 all_24h_ads_gdhi_fit <- linear_reg() %>%
@@ -100,7 +100,7 @@ all_24h_nsud_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_nsud_gdhi_fit
 ```
-How living in urban or rural area effects IQOL:
+How does living in urban or rural area affect IQOL:
 ```{r urbanrural-24h_download, echo = FALSE}
 all_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -147,7 +147,29 @@ aug_24h_ads_ur_fit <- linear_reg() %>%
   tidy()
 aug_24h_ads_ur_fit
 ```
+How do GDHI per head and Urban/rural area affect 24 hours average download speed:
+```{r setseed-split, echo=FALSE}
+set.seed(1234)
+all_gdhi_join_split <- initial_split(all_gdhi_join)
+all_gdhi_join_train <- training(all_gdhi_join_split)
+all_gdhi_join_test <- testing(all_gdhi_join_split)
+```
+```{r variables effect 24h-download, echo=FALSE }
+all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join_train) %>%
+ step_dummy(all_nominal(), -all_outcomes()) 
 
+all_gdhi_join_train_mod <- linear_reg() %>%
+ set_engine('lm')
+
+all_gdhi_join_train_wflow <- workflow() %>% 
+ add_model(all_gdhi_join_train_mod) %>% 
+ add_recipe(all_gdhi_join_train_rec)
+
+all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>% 
+ fit(data = all_gdhi_join_train)
+
+all_gdhi_join_train_fit
+```
 
 ---
 
