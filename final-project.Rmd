@@ -93,9 +93,11 @@ blues <- brewer.pal(9, "Blues")
 
 class_feb <- cut(feb_joined$mean_24hr, 9)
 col_feb <- reds[as.numeric(class_feb)]
+plot(feb_joined, col = col_feb)
 
 class_aug <- cut(aug_joined$mean_24hr, 9)
-col_aug <- blues[as.numeric(class_aug)]
+col_aug <- reds[as.numeric(class_aug)]
+plot(aug_joined, col = col_aug)
 
 ```
 
