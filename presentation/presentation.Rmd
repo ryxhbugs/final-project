@@ -87,6 +87,15 @@ all_24h_pl_gdhi_fit <- linear_reg() %>%
 all_24h_pl_gdhi_fit
 ```
 
+```{r income-24h_packetloss, echo = FALSE}
+# Predicting 24 hour latency from GDHI per head
+all_24h_ltcy_gdhi_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(x24_hour_latency ~ gdhi_per_head, data = all_gdhi_join) %>%
+  tidy()
+all_24h_ltcy_gdhi_fit
+```
+
 ```{r income-24h_netflixstartupdelay, echo = FALSE}
 # Predicting 24 hour netflix startup delay from GDHI per head
 all_24h_nsud_gdhi_fit <- linear_reg() %>%
