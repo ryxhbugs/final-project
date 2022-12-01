@@ -125,77 +125,6 @@ ggplot(feb_24h_ads_ur_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 
-### jitter_upstrem VS ads
-```{r jitter_upstrem VS ads}
-feb_2019_ju_ads_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hour_jitter_upstream ~ x24_hr_average_download_speed, data = feb_2019) %>%
-  tidy()
-feb_2019_ju_ads_fit
-```
-
-
-### residual plot(jitter_upstrem VS ads)
-```{r residual plot(jitter_upstrem VS ads)}
-feb_2019_ju_ads_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hour_jitter_upstream ~ x24_hr_average_download_speed, data = feb_2019)
-feb_2019_ju_ads_fit_aug  <- augment(feb_2019_ju_ads_fit$fit)
-
-ggplot(feb_2019_ju_ads_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
-  geom_point(alpha = 0.5) +
-  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted x24_hour_jitter_upstream", y = "Residuals")
-```
-
-
-### jitter_downstrem VS ads
-```{r jitter_downstrem VS ads}
-feb_2019_jd_ads_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hour_jitter_downstream ~ x24_hr_average_download_speed, data = feb_2019) %>%
-  tidy()
-feb_2019_jd_ads_fit
-```
-
-
-
-### residual plot(jitter_downstrem VS ads)
-```{r residual plot(jitter_downstrem VS ads)}
-feb_2019_jd_ads_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hour_jitter_downstream ~ x24_hr_average_download_speed, data = feb_2019)
-feb_2019_jd_ads_fit_aug  <- augment(feb_2019_jd_ads_fit$fit)
-
-ggplot(feb_2019_jd_ads_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
-  geom_point(alpha = 0.5) +
-  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted x24_hour_jitter_downstream", y = "Residuals")
-```
-
-
-### ads vs latency
-```{r ads vs latency}
-feb_2019_ads_latency_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hr_average_download_speed ~ x24_hour_latency, data = feb_2019) %>%
-  tidy()
-feb_2019_ads_latency_fit
-```
-
-
-### residual plot(ads vs latency)
-```{r residual plot(ads vs latency)}
-feb_2019_ads_latency_fit <- linear_reg() %>%
-  set_engine("lm") %>%
-  fit(x24_hr_average_download_speed ~ x24_hour_latency, data = feb_2019)
-feb_2019_ads_latency_fit_aug  <- augment(feb_2019_ads_latency_fit$fit)
-
-ggplot(feb_2019_ads_latency_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
-  geom_point(alpha = 0.5) +
-  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted x24_hr_average_download_speed", y = "Residuals")
-```
 
 
 ### (feb)ads VS dfe
@@ -275,6 +204,82 @@ ggplot(feb_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 
+### (aug)ads VS dfe
+```{r (aug)ads VS dfe}
+aug_2019_dfe <- aug_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "50",
+      distance_from_exchange == "101 to 200m" ~ "150",
+      distance_from_exchange == "201 to 300m" ~ "250",
+      distance_from_exchange == "301 to 400m" ~ "350",
+      distance_from_exchange == "401 to 500m" ~ "450",
+      distance_from_exchange == "501 to 600m" ~ "550",
+      distance_from_exchange == "601 to 700m" ~ "650",
+      distance_from_exchange == "701 to 800m" ~ "750",
+      distance_from_exchange == "801 to 900m" ~ "850",
+      distance_from_exchange == "901 to 1000m" ~ "950",
+      distance_from_exchange == "1001 to 1100m" ~ "1050",
+      distance_from_exchange == "1101 to 1200m" ~ "1150",
+      distance_from_exchange == "1201 to 1300m" ~ "1250",
+      distance_from_exchange == "1301 to 1400m" ~ "1350",
+      distance_from_exchange == "1401 to 1500m" ~ "1450",
+      distance_from_exchange == "1501 to 1600m" ~ "1550",
+      distance_from_exchange == "1601 to 1700m" ~ "1650",
+      distance_from_exchange == "1701 to 1800m" ~ "1750",
+      distance_from_exchange == "1801 to 1900m" ~ "1850",
+      distance_from_exchange == "1901 to 2000m" ~ "1950",
+      distance_from_exchange == "2001 to 2100m" ~ "2050",
+      distance_from_exchange == "2101 to 2200m" ~ "2150",
+      distance_from_exchange == "2201 to 2300m" ~ "2250",
+      distance_from_exchange == "2301 to 2400m" ~ "2350",
+      distance_from_exchange == "2401 to 2500m" ~ "2450",
+      distance_from_exchange == "2501 to 2600m" ~ "2550",
+      distance_from_exchange == "2601 to 2700m" ~ "2650",
+      distance_from_exchange == "2701 to 2800m" ~ "2750",
+      distance_from_exchange == "2801 to 2900m" ~ "2850",
+      distance_from_exchange == "2901 to 3000m" ~ "2950",
+      distance_from_exchange == "3001 to 3250m" ~ "3125",
+      distance_from_exchange == "3251 to 3500m" ~ "3375",
+      distance_from_exchange == "3501 to 3750m" ~ "3625",
+      distance_from_exchange == "3751 to 4000m" ~ "3875",
+      distance_from_exchange == "4001 to 4500m" ~ "4250",
+      distance_from_exchange == "4501 to 5000m" ~ "4750",
+      distance_from_exchange == "5001 to 5500m" ~ "5250",
+      distance_from_exchange == "Over 5500m" ~ "5500"
+    ))
+
+aug_2019_dfe$distance_from_exchange <- as.numeric(as.character(aug_2019_dfe$distance_from_exchange))
+
+aug_2019_ads_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hr_average_download_speed) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ads = mean(x24_hr_average_download_speed)
+  )
+
+aug_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = aug_2019_ads_dfe) %>%
+  tidy()
+aug_2019_ads_dfe_fit
+```
+
+
+### (aug)residual plot(ads VS dfe)
+```{r (aug)residual plot(ads VS dfe)}
+aug_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = aug_2019_ads_dfe)
+aug_2019_ads_dfe_fit_aug  <- augment(aug_2019_ads_dfe_fit$fit)
+
+ggplot(aug_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ads", y = "Residuals")
+```
+
 ### (feb) jitter upstream VS dfe
 ```{r jitter upstream VS dfe}
 feb_2019_ju_dfe <- feb_2019_dfe %>%
@@ -306,6 +311,36 @@ ggplot(feb_2019_ju_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 
+### (aug) jitter upstream VS dfe
+```{r (aug)jitter upstream VS dfe}
+aug_2019_ju_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_upstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ju = mean(x24_hour_jitter_upstream)
+  )
+
+aug_2019_ju_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ju ~ distance_from_exchange, data = aug_2019_ju_dfe) %>%
+  tidy()
+aug_2019_ju_dfe_fit
+```
+
+
+### (aug)residual plot(jitter upstream VS dfe)
+```{r (aug)residual plot(jitter upstream VS dfe)}
+aug_2019_ju_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ju ~ distance_from_exchange, data = aug_2019_ju_dfe)
+aug_2019_ju_dfe_fit_aug  <- augment(aug_2019_ju_dfe_fit$fit)
+
+ggplot(aug_2019_ju_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ju", y = "Residuals")
+```
+
 ### (feb) jitter downstream VS dfe
 ```{r jitter downstream VS dfe}
 feb_2019_jd_dfe <- feb_2019_dfe %>%
@@ -334,6 +369,162 @@ ggplot(feb_2019_jd_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
   labs(x = "Predicted avg_jd", y = "Residuals")
+```
+
+
+### (aug) jitter downstream VS dfe
+```{r (aug)jitter downstream VS dfe}
+aug_2019_jd_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_downstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_jd = mean(x24_hour_jitter_downstream)
+  )
+
+aug_2019_jd_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_jd ~ distance_from_exchange, data = aug_2019_jd_dfe) %>%
+  tidy()
+aug_2019_jd_dfe_fit
+```
+
+
+### (aug)residual plot(jitter downstream VS dfe)
+```{r (aug)residual plot(jitter downstream VS dfe)}
+aug_2019_jd_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_jd ~ distance_from_exchange, data = aug_2019_jd_dfe)
+aug_2019_jd_dfe_fit_aug  <- augment(aug_2019_jd_dfe_fit$fit)
+
+ggplot(aug_2019_jd_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_jd", y = "Residuals")
+```
+
+
+### (feb) latency VS dfe
+```{r (feb)latency VS dfe}
+feb_2019_latency_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_latency) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_latency = mean(x24_hour_latency)
+  )
+
+feb_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = feb_2019_latency_dfe) %>%
+  tidy()
+feb_2019_latency_dfe_fit
+```
+
+
+### (feb)residual plot(latency VS dfe)
+```{r (feb)residual plot(latency VS dfe)}
+feb_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = feb_2019_latency_dfe)
+feb_2019_latency_dfe_fit_aug  <- augment(feb_2019_latency_dfe_fit$fit)
+
+ggplot(feb_2019_latency_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_latency", y = "Residuals")
+```
+
+
+### (aug) latency VS dfe
+```{r (aug)latency VS dfe}
+aug_2019_latency_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_latency) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_latency = mean(x24_hour_latency)
+  )
+
+aug_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = aug_2019_latency_dfe) %>%
+  tidy()
+aug_2019_latency_dfe_fit
+```
+
+
+
+### (aug)residual plot(latency VS dfe)
+```{r (aug)residual plot(latency VS dfe)}
+aug_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = aug_2019_latency_dfe)
+aug_2019_latency_dfe_fit_aug  <- augment(aug_2019_latency_dfe_fit$fit)
+
+ggplot(aug_2019_latency_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_latency", y = "Residuals")
+```
+
+
+### (feb) packet loss VS dfe
+```{r (feb)packet loss VS dfe}
+feb_2019_pl_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_packet_loss) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_pl = mean(x24_hour_packet_loss)
+  )
+
+feb_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = feb_2019_pl_dfe) %>%
+  tidy()
+feb_2019_pl_dfe_fit
+```
+
+
+### (feb)residual plot(packet loss VS dfe)
+```{r (feb)residual plot(packet loss VS dfe)}
+feb_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = feb_2019_pl_dfe)
+feb_2019_pl_dfe_fit_aug  <- augment(feb_2019_pl_dfe_fit$fit)
+
+ggplot(feb_2019_pl_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_pl", y = "Residuals")
+```
+
+
+### (aug) packet loss VS dfe
+```{r (aug)packet loss VS dfe}
+aug_2019_pl_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_packet_loss) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_pl = mean(x24_hour_packet_loss)
+  )
+
+aug_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = aug_2019_pl_dfe) %>%
+  tidy()
+aug_2019_pl_dfe_fit
+```
+
+
+### (aug)residual plot(packet loss VS dfe)
+```{r (aug)residual plot(packet loss VS dfe)}
+aug_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = aug_2019_pl_dfe)
+aug_2019_pl_dfe_fit_aug  <- augment(aug_2019_pl_dfe_fit$fit)
+
+ggplot(aug_2019_pl_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_pl", y = "Residuals")
 ```
 
 ### All Months - predicting ADS from GDHI
