@@ -85,7 +85,15 @@ Zhihong
 
 # Model Training and Prediction
 
-Eddie
+ - Some predicted values were similar to the observed
+
+ - However many were significantly different.
+
+ - ADS = 39.15 + Urban/Rural(42.26) + GDHI(1.67*10^-4)
+
+ - Equation of model heavily weighted to significance of urban/rural.
+
+ - This suggests some other variable may be involved or more data is required to see significance of GDHI
 
 ---
 
