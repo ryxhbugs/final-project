@@ -15,6 +15,7 @@ library(janitor)
 library(geojsonio)
 library(ggplot2)
 library(dplyr)
+library(spdplyr)
 ```
 
 ### Read in data from .csv files
@@ -66,7 +67,8 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 ```{r maps, fig.height = 5, fig.width = 3.5}
 
-region_map <- geojson_read("uk_regions.geojson", what = "sp")
+region_map <- geojson_read("uk_regions.geojson", what = "sp") %>%
+  rename(region = rgn19nm)
 
 ggplot() +
   geom_polygon(data = region_map, aes(x = long, y = lat, group = group), 
