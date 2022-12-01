@@ -67,6 +67,78 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 ```
 
+### Graphs of internet quality factors against variables effect
+
+```{r x24h_adv vs region}
+ggplot(data = all_gdhi_join, 
+       aes(x = region, y = x24_hr_average_download_speed, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE, fullrange = TRUE) +
+  labs(
+    title = "Regions effect 24h average download speed, by urban/rural features",
+    x = "regions in UK",
+    y = "24h download speed",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+```{r x24h_adv vs def}
+ggplot(data = all_gdhi_join, 
+       aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE, fullrange = TRUE) +
+  labs(
+    title = "distance effects 24h download speed, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h average download speed",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip() 
+```
+```{r x24h_packet_loss vs def}
+ggplot(data = feb_gdhi_join, 
+       aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE) +
+  labs(
+    title = "distance effects 24h packet loss, by urban/rural features",
+    x = "distancefromexchange",
+    y = "24h packet loss",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+```{r x24h_latency vs def}
+ggplot(data = all_gdhi_join, 
+       aes(x = distance_from_exchange, y = x24_hour_latency, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE) +
+  labs(
+    title = "distance effects 24h packet loss, by urban/rural features",
+    x = "distancefromexchange",
+    y = "24h packet loss",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+```{r x24h_latency vs def}
+ggplot(data = all_gdhi_join, 
+       aes(x = distance_from_exchange, y = x24_hour_latency, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE) +
+  labs(
+    title = "distance effects 24h latency, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h latency",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
 
 ### Maps of regional variation
 ```{r maps, fig.height = 5, fig.width = 10, warning = FALSE}
