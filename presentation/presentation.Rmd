@@ -457,7 +457,7 @@ all_2019_ads_dfe_fit <- linear_reg() %>%
   tidy()
 all_2019_ads_dfe_fit
 ```
-(2019) latency VS distance_from_exchange(dfe)
+(2019) average_latency VS distance_from_exchange(dfe)
 ```{r (all) latency VS distance_from_exchange, echo=FALSE}
 all_2019_latency_dfe <- all_2019_dfe %>%
   select(distance_from_exchange, x24_hour_latency) %>%
@@ -472,7 +472,7 @@ all_2019_latency_dfe_fit <- linear_reg() %>%
   tidy()
 all_2019_latency_dfe_fit
 ```
-(2019) packet loss VS distance_from_exchange(dfe)
+(2019) average_packet_loss VS distance_from_exchange(dfe)
 ```{r (all) packet loss VS distance_from_exchange, echo=FALSE}
 all_2019_pl_dfe <- all_2019_dfe %>%
   select(distance_from_exchange, x24_hour_packet_loss) %>%
@@ -503,7 +503,7 @@ ggplot(all_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 ---
-(2019)residual plot(latency VS distance_from_exchange(dfe))
+(2019)residual plot(average_latency VS distance_from_exchange(dfe))
 ```{r (all)residual plot(latency VS distance_from_exchange), echo=FALSE}
 all_2019_latency_dfe_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -517,7 +517,7 @@ ggplot(all_2019_latency_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 ---
-(2019)residual plot(packet loss VS distance_from_exchange(dfe))
+(2019)residual plot(average_packet_loss VS distance_from_exchange(dfe))
 ```{r (all)residual plot(packet loss VS distance_from_exchange), echo=FALSE}
 all_2019_pl_dfe_fit <- linear_reg() %>%
   set_engine("lm") %>%
