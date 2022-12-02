@@ -94,13 +94,17 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 ---
 
-# Findings / Summary
+# Findings
 
 ```{r echo = FALSE, out.width = "38%", fig.show='hold'}
 knitr::include_graphics(c("img/dfe~adv.png","img/dfe~ltcy.png"))
 knitr::include_graphics(c("img/dfe~pl.png","img/region~adv.png"))
 ```
-
+---
+# Summary
+ - We saw trends in the data that exist between location and Internet QOL
+ - Not enough data to be able to back up this link
+ - Unable to establish a clear/strong connection given the data we had
 ---
 
 # Choropleth Maps
@@ -124,7 +128,7 @@ all_24h_ads_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_ads_gdhi_fit
 ```
-Predicting 24 hour packet loss from GDHI per head
+Predicting 24 hour average packet loss from GDHI per head
 ```{r income-24h_packetloss, echo = FALSE}
 all_24h_pl_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -135,7 +139,7 @@ all_24h_pl_gdhi_fit
 
 ---
 
-Predicting 24 hour latency from GDHI per head
+Predicting 24 hour average latency from GDHI per head
 ```{r income-24h_latency, echo = FALSE}
 all_24h_ltcy_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -143,7 +147,7 @@ all_24h_ltcy_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_ltcy_gdhi_fit
 ```
-Predicting 24 hour netflix startup delay from GDHI per head
+Predicting 24 hour average netflix startup delay from GDHI per head
 ```{r income-24h_netflixstartupdelay, echo = FALSE}
 all_24h_nsud_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -172,7 +176,7 @@ all_24h_pl_gdhi_fit
 
 ---
 
-Predicting 24 hour latency from urban rural area
+Predicting 24 hour average latency from urban rural area
 ```{r ur-24h_latency, echo = FALSE}
 all_24h_pl_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -180,7 +184,7 @@ all_24h_pl_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_pl_gdhi_fit
 ```
-Predicting 24 hour netflix startup delay from urban rural area
+Predicting 24 hour average netflix startup delay from urban rural area
 ```{r ur-24h_netflixstartupdelay, echo = FALSE}
 all_24h_nsud_gdhi_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -203,30 +207,6 @@ aug_24h_ads_ur_fit <- linear_reg() %>%
   fit(x24_hr_average_download_speed ~ urban_rural, data = aug_gdhi_join) %>%
   tidy()
 aug_24h_ads_ur_fit
-```
----
-# How do GDHI per head and Urban/rural area affect 24 hours average download speed:
-```{r setseed-split, echo=FALSE}
-set.seed(1234)
-all_gdhi_join_split <- initial_split(all_gdhi_join)
-all_gdhi_join_train <- training(all_gdhi_join_split)
-all_gdhi_join_test <- testing(all_gdhi_join_split)
-```
-```{r variables effect 24h-download, echo=FALSE }
-all_gdhi_join_train_rec <- recipe(x24_hr_average_download_speed ~ urban_rural + gdhi_per_head, data = all_gdhi_join_train) %>%
- step_dummy(all_nominal(), -all_outcomes()) 
-
-all_gdhi_join_train_mod <- linear_reg() %>%
- set_engine('lm')
-
-all_gdhi_join_train_wflow <- workflow() %>% 
- add_model(all_gdhi_join_train_mod) %>% 
- add_recipe(all_gdhi_join_train_rec)
-
-all_gdhi_join_train_fit <- all_gdhi_join_train_wflow %>% 
- fit(data = all_gdhi_join_train)
-
-all_gdhi_join_train_fit
 ```
 
 ---
@@ -391,5 +371,4 @@ class: inverse, center, middle
 
 ## Thank You
 
----
 

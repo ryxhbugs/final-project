@@ -51,10 +51,14 @@ class: center, middle, inverse, title-slide
 
 ---
 
-# Findings / Summary
+# Findings
 
 &lt;img src="img/dfe~adv.png" width="38%" /&gt;&lt;img src="img/dfe~ltcy.png" width="38%" /&gt;&lt;img src="img/dfe~pl.png" width="38%" /&gt;&lt;img src="img/region~adv.png" width="38%" /&gt;
-
+---
+# Summary
+ - We saw trends in the data that exist between location and Internet QOL
+ - Not enough data to be able to back up this link
+ - Unable to establish a clear/strong connection given the data we had
 ---
 
 # Choropleth Maps
@@ -76,7 +80,7 @@ Predicting 24 hour average download speed from GDHI per head
 ## 1 (Intercept)   42.0      7.83          5.36 0.0000000881
 ## 2 gdhi_per_head  0.00130  0.000369      3.52 0.000435
 ```
-Predicting 24 hour packet loss from GDHI per head
+Predicting 24 hour average packet loss from GDHI per head
 
 ```
 ## # A tibble: 2 × 5
@@ -88,7 +92,7 @@ Predicting 24 hour packet loss from GDHI per head
 
 ---
 
-Predicting 24 hour latency from GDHI per head
+Predicting 24 hour average latency from GDHI per head
 
 ```
 ## # A tibble: 2 × 5
@@ -97,7 +101,7 @@ Predicting 24 hour latency from GDHI per head
 ## 1 (Intercept)   32.4      1.10           29.4 1.12e-170
 ## 2 gdhi_per_head -0.000769 0.0000519     -14.8 3.12e- 48
 ```
-Predicting 24 hour netflix startup delay from GDHI per head
+Predicting 24 hour average netflix startup delay from GDHI per head
 
 ```
 ## # A tibble: 2 × 5
@@ -129,7 +133,7 @@ Predicting 24 hour average packet loss from urban rural area
 
 ---
 
-Predicting 24 hour latency from urban rural area
+Predicting 24 hour average latency from urban rural area
 
 ```
 ## # A tibble: 2 × 5
@@ -138,7 +142,7 @@ Predicting 24 hour latency from urban rural area
 ## 1 (Intercept)         18.8      0.271      69.2 0       
 ## 2 urban_ruralUrban    -4.30     0.339     -12.7 4.32e-36
 ```
-Predicting 24 hour netflix startup delay from urban rural area
+Predicting 24 hour average netflix startup delay from urban rural area
 
 ```
 ## # A tibble: 2 × 5
@@ -164,29 +168,6 @@ Predicting 24 hour netflix startup delay from urban rural area
 ##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)          45.0      2.96      15.2 1.60e-49
 ## 2 urban_ruralUrban     45.7      3.70      12.3 9.24e-34
-```
----
-# How do GDHI per head and Urban/rural area affect 24 hours average download speed:
-
-
-```
-## ══ Workflow [trained] ══════════════════════════════════════════════════════════
-## Preprocessor: Recipe
-## Model: linear_reg()
-## 
-## ── Preprocessor ────────────────────────────────────────────────────────────────
-## 1 Recipe Step
-## 
-## • step_dummy()
-## 
-## ── Model ───────────────────────────────────────────────────────────────────────
-## 
-## Call:
-## stats::lm(formula = ..y ~ ., data = data)
-## 
-## Coefficients:
-##       (Intercept)      gdhi_per_head  urban_rural_Urban  
-##         3.915e+01          1.673e-04          4.264e+01
 ```
 
 ---
@@ -257,7 +238,6 @@ class: inverse, center, middle
 
 ## Thank You
 
----
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
