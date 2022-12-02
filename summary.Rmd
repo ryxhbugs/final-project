@@ -56,3 +56,15 @@ https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-li
 
 https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
 
+References for maps:
+
+https://www.r-graph-gallery.com 
+
+https://www.kaggle.com/datasets/dorianlazar/uk-regions-geojson
+
+https://cran.r-project.org/web/packages/geojsonio/geojsonio.pdf 
+
+https://www.rdocumentation.org/packages/graphics/versions/3.6.2/topics/plot 
+
+https://rdrr.io/cran/tigris/man/geo_join.html 
+
