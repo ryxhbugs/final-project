@@ -84,7 +84,7 @@ ggplot(data = all_gdhi_join,
   coord_flip()
 ```
 ```{r x24h_adv vs def}
-feb_2019_dfe <- feb_2019 %>%
+feb_2019_dfe_plot <- feb_2019 %>%
   drop_na() %>%
   mutate(
     distance_from_exchange = case_when(
@@ -127,7 +127,7 @@ feb_2019_dfe <- feb_2019 %>%
       distance_from_exchange == "5001 to 5500m" ~ "37",
       distance_from_exchange == "Over 5500m" ~ "38"
     ))
-aug_2019_dfe <- aug_2019 %>%
+aug_2019_dfe_plot <- aug_2019 %>%
   drop_na() %>%
   mutate(
     distance_from_exchange = case_when(
@@ -171,16 +171,15 @@ aug_2019_dfe <- aug_2019 %>%
       distance_from_exchange == "Over 5500m" ~ "38"
     ))
 
-aug_2019_dfe_month <- aug_2019_dfe %>%
+aug_2019_dfe_plot_month <- aug_2019_dfe_plot %>%
   mutate(month = "August")
-all_2019_dfe <- feb_2019_dfe %>%
+all_2019_dfe_plot <- feb_2019_dfe_plot %>%
   mutate(month = "February") %>%
-  rbind(aug_2019_def_month)
+  rbind(aug_2019_dfe_plot_month)
 
-ggplot(data = all_2019_dfe, 
+ggplot(data = all_2019_dfe_plot, 
        aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(formula = y~x, method = "lm", se = FALSE, fullrange = TRUE) +
   labs(
     title = "distance effects 24h download speed, by urban/rural features",
     x = "distance from exchange",
@@ -191,12 +190,12 @@ ggplot(data = all_2019_dfe,
   coord_flip() 
 ```
 ```{r x24h_packet_loss vs dfe}
-ggplot(data = all_2019_dfe, 
+ggplot(data = all_2019_dfe_plot, 
        aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
   geom_point(alpha = 0.4) +
   labs(
     title = "distance effects 24h packet loss, by urban/rural features",
-    x = "distancefromexchange",
+    x = "distance from exchange",
     y = "24h packet loss",
     color = "urban/rural"
   ) +
@@ -204,14 +203,14 @@ ggplot(data = all_2019_dfe,
   coord_flip()
 ```
 ```{r x24h_latency vs dfe}
-ggplot(data = all_2019_dfe, 
+ggplot(data = all_2019_dfe_plot, 
        aes(x = distance_from_exchange, y = x24_hour_latency, colour = urban_rural)) +
   geom_point(alpha = 0.4) +
   geom_smooth(formula = y~x, method = "lm", se = FALSE) +
   labs(
-    title = "distance effects 24h packet loss, by urban/rural features",
-    x = "distancefromexchange",
-    y = "24h packet loss",
+    title = "distance effects 24h latency, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h latency",
     color = "urban/rural"
   ) +
   scale_color_manual(values = c("#E48957", "#071381")) +
