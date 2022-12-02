@@ -105,7 +105,10 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 # Choropleth Maps
 
-Ryan
+```{r echo = FALSE, out.width = "34%", fig.show='hold'}
+knitr::include_graphics(c("maps/speed-feb.png","maps/speed-aug.png"))
+knitr::include_graphics(c("maps/gdhi.png","maps/ratio.png"))
+``` 
 
 ---
 
