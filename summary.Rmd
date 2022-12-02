@@ -19,7 +19,7 @@ If you got your data off the web, make sure to note the retrieval date.
 
 For our project we used 3 datasets in total, 2 from data.gov.ukm, and one from ons.gov.uk. The first two datasets concern fixed line broadband speeds in the UK in February and August 2019, respectively. Both datasets come from Ofcom, the UK's communications regulator. The broadband data was collected from a sample of customers who had speed monitoring equipment stored in their homes.
 
-The third data contains information on the GDHI (Gross Disposable Household Income) for UK consituent countries and regions.
+The third dataset contains information on the GDHI (Gross Disposable Household Income) for UK consituent countries and regions.
 
 For the purposes of our project, we will be mainly focusing on 24 hour average download speed, Urban/Rural (whether or not a reading comes from an urban or rural location) and GDHI per head.
 
@@ -78,6 +78,8 @@ feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
 aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
 all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 ```
+
+### The impact of GDHI and urban/rural location on internet quality
 To examine relationships between different variables in our dataset (variables which relate to location and internet quality of life, or IQOL) we experimented with fitting various linear models to our data. We started by looking primarily at investigating the link between the variables household income (GDHI per head, where GDHI stands for Gross Domestic Household Income), and Urban/Rural (whether a broadband customer lived in an urban or rural location), and internet quality of life indicators. We focused first on 24 hour average download speed, but then moved on to look at other variables such as packet loss and Netflix start up delay. Packet loss is when is when data packets sent over the internet fail to reach their destination (1), and this manifests itself in network disruption and slow service, which we felt were key when determining internet quality. We also focused on Netflix startup delay - given the rising popularity of internet streaming services, and the fact that Netflix is the most popular in the UK (2). A household with good internet quality of life would have high download speeds, lower packet loss, minimal startup delays, etc.
 
 We plotted the following linear regression models using GDHI as a single predictor for 24 hour download speed, packet loss and Netflix start up delay:
@@ -192,6 +194,373 @@ We can also see the adjusted R squared value for the model below:
 glance(all_gdhi_join_train_fit)$adj.r.squared
 ```
 Here we get a value of 7.5%, which is quite low, suggesting that the model is not very good at predicting average download speed, as it does a poor job of predicting the test set data.
+
+### The impact of distance from exchange on internet quality
+As part of geographic location, distance from exchange is also an important factor affecting internet quality. We have used linear regression to analyze the extent to which average download speed, jitter, latency and packet loss are affected by distance from exchange.
+
+These parameters are valuable to study as they affect many aspects of network life, such as latency affecting the gaming experience, average download speed and packet loss affecting load time, and jitter affecting call quality. 
+
+The following are linear regression models for the various parameters and distance from exchange in February and August, respectively.
+
+```{r (feb)average_download_speed VS distance_from_exchange, echo=FALSE}
+feb_2019_dfe <- feb_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "50",
+      distance_from_exchange == "101 to 200m" ~ "150",
+      distance_from_exchange == "201 to 300m" ~ "250",
+      distance_from_exchange == "301 to 400m" ~ "350",
+      distance_from_exchange == "401 to 500m" ~ "450",
+      distance_from_exchange == "501 to 600m" ~ "550",
+      distance_from_exchange == "601 to 700m" ~ "650",
+      distance_from_exchange == "701 to 800m" ~ "750",
+      distance_from_exchange == "801 to 900m" ~ "850",
+      distance_from_exchange == "901 to 1000m" ~ "950",
+      distance_from_exchange == "1001 to 1100m" ~ "1050",
+      distance_from_exchange == "1101 to 1200m" ~ "1150",
+      distance_from_exchange == "1201 to 1300m" ~ "1250",
+      distance_from_exchange == "1301 to 1400m" ~ "1350",
+      distance_from_exchange == "1401 to 1500m" ~ "1450",
+      distance_from_exchange == "1501 to 1600m" ~ "1550",
+      distance_from_exchange == "1601 to 1700m" ~ "1650",
+      distance_from_exchange == "1701 to 1800m" ~ "1750",
+      distance_from_exchange == "1801 to 1900m" ~ "1850",
+      distance_from_exchange == "1901 to 2000m" ~ "1950",
+      distance_from_exchange == "2001 to 2100m" ~ "2050",
+      distance_from_exchange == "2101 to 2200m" ~ "2150",
+      distance_from_exchange == "2201 to 2300m" ~ "2250",
+      distance_from_exchange == "2301 to 2400m" ~ "2350",
+      distance_from_exchange == "2401 to 2500m" ~ "2450",
+      distance_from_exchange == "2501 to 2600m" ~ "2550",
+      distance_from_exchange == "2601 to 2700m" ~ "2650",
+      distance_from_exchange == "2701 to 2800m" ~ "2750",
+      distance_from_exchange == "2801 to 2900m" ~ "2850",
+      distance_from_exchange == "2901 to 3000m" ~ "2950",
+      distance_from_exchange == "3001 to 3250m" ~ "3125",
+      distance_from_exchange == "3251 to 3500m" ~ "3375",
+      distance_from_exchange == "3501 to 3750m" ~ "3625",
+      distance_from_exchange == "3751 to 4000m" ~ "3875",
+      distance_from_exchange == "4001 to 4500m" ~ "4250",
+      distance_from_exchange == "4501 to 5000m" ~ "4750",
+      distance_from_exchange == "5001 to 5500m" ~ "5250",
+      distance_from_exchange == "Over 5500m" ~ "5500"
+    ))
+
+feb_2019_dfe$distance_from_exchange <- as.numeric(as.character(feb_2019_dfe$distance_from_exchange))
+
+feb_2019_ads_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hr_average_download_speed) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ads = mean(x24_hr_average_download_speed)
+  )
+
+feb_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = feb_2019_ads_dfe) %>%
+  tidy()
+feb_2019_ads_dfe_fit
+```
+
+
+```{r (aug)average_download_speed VS distance_from_exchange, echo=FALSE}
+aug_2019_dfe <- aug_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "50",
+      distance_from_exchange == "101 to 200m" ~ "150",
+      distance_from_exchange == "201 to 300m" ~ "250",
+      distance_from_exchange == "301 to 400m" ~ "350",
+      distance_from_exchange == "401 to 500m" ~ "450",
+      distance_from_exchange == "501 to 600m" ~ "550",
+      distance_from_exchange == "601 to 700m" ~ "650",
+      distance_from_exchange == "701 to 800m" ~ "750",
+      distance_from_exchange == "801 to 900m" ~ "850",
+      distance_from_exchange == "901 to 1000m" ~ "950",
+      distance_from_exchange == "1001 to 1100m" ~ "1050",
+      distance_from_exchange == "1101 to 1200m" ~ "1150",
+      distance_from_exchange == "1201 to 1300m" ~ "1250",
+      distance_from_exchange == "1301 to 1400m" ~ "1350",
+      distance_from_exchange == "1401 to 1500m" ~ "1450",
+      distance_from_exchange == "1501 to 1600m" ~ "1550",
+      distance_from_exchange == "1601 to 1700m" ~ "1650",
+      distance_from_exchange == "1701 to 1800m" ~ "1750",
+      distance_from_exchange == "1801 to 1900m" ~ "1850",
+      distance_from_exchange == "1901 to 2000m" ~ "1950",
+      distance_from_exchange == "2001 to 2100m" ~ "2050",
+      distance_from_exchange == "2101 to 2200m" ~ "2150",
+      distance_from_exchange == "2201 to 2300m" ~ "2250",
+      distance_from_exchange == "2301 to 2400m" ~ "2350",
+      distance_from_exchange == "2401 to 2500m" ~ "2450",
+      distance_from_exchange == "2501 to 2600m" ~ "2550",
+      distance_from_exchange == "2601 to 2700m" ~ "2650",
+      distance_from_exchange == "2701 to 2800m" ~ "2750",
+      distance_from_exchange == "2801 to 2900m" ~ "2850",
+      distance_from_exchange == "2901 to 3000m" ~ "2950",
+      distance_from_exchange == "3001 to 3250m" ~ "3125",
+      distance_from_exchange == "3251 to 3500m" ~ "3375",
+      distance_from_exchange == "3501 to 3750m" ~ "3625",
+      distance_from_exchange == "3751 to 4000m" ~ "3875",
+      distance_from_exchange == "4001 to 4500m" ~ "4250",
+      distance_from_exchange == "4501 to 5000m" ~ "4750",
+      distance_from_exchange == "5001 to 5500m" ~ "5250",
+      distance_from_exchange == "Over 5500m" ~ "5500"
+    ))
+
+aug_2019_dfe$distance_from_exchange <- as.numeric(as.character(aug_2019_dfe$distance_from_exchange))
+
+aug_2019_ads_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hr_average_download_speed) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ads = mean(x24_hr_average_download_speed)
+  )
+
+aug_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = aug_2019_ads_dfe) %>%
+  tidy()
+aug_2019_ads_dfe_fit
+```
+
+
+```{r (feb) latency VS distance_from_exchange, echo=FALSE}
+feb_2019_latency_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_latency) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_latency = mean(x24_hour_latency)
+  )
+
+feb_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = feb_2019_latency_dfe) %>%
+  tidy()
+feb_2019_latency_dfe_fit
+```
+
+
+```{r (aug) latency VS distance_from_exchange, echo=FALSE}
+aug_2019_latency_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_latency) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_latency = mean(x24_hour_latency)
+  )
+
+aug_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = aug_2019_latency_dfe) %>%
+  tidy()
+aug_2019_latency_dfe_fit
+```
+
+
+```{r (feb) packet loss VS distance_from_exchange, echo=FALSE}
+feb_2019_pl_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_packet_loss) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_pl = mean(x24_hour_packet_loss)
+  )
+
+feb_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = feb_2019_pl_dfe) %>%
+  tidy()
+feb_2019_pl_dfe_fit
+```
+
+
+```{r (aug) packet loss VS distance_from_exchange, echo=FALSE}
+aug_2019_pl_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_packet_loss) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_pl = mean(x24_hour_packet_loss)
+  )
+
+aug_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = aug_2019_pl_dfe) %>%
+  tidy()
+aug_2019_pl_dfe_fit
+```
+
+Based on these linear regressions, it can be concluded that average download speed and distance from exchange are negatively correlated, and latency and packet loss are positively correlated with distance from exchange. In February, for every 1000m increase in distance from exchange, the average download speed will decrease by 6.3Mbps, the latency will increase by 1.1ms and the packet loss rate will increase by 0.014%, on average. In August, for every 1000m increase in distance from exchange, the average download speed will decrease by 4.6Mbps, the latency will increase by 0.38ms and the packet loss rate will increase by 0.005%, on average.
+
+However, according to the following code, jitter doesn’t correlate to distance from exchange.
+
+
+```{r (feb) jitter upstream VS distance_from_exchange, echo=FALSE}
+feb_2019_ju_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_upstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ju = mean(x24_hour_jitter_upstream)
+  )
+
+feb_2019_ju_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ju ~ distance_from_exchange, data = feb_2019_ju_dfe) %>%
+  tidy()
+feb_2019_ju_dfe_fit
+```
+
+
+```{r (aug) jitter upstream VS distance_from_exchange, echo=FALSE}
+aug_2019_ju_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_upstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ju = mean(x24_hour_jitter_upstream)
+  )
+
+aug_2019_ju_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ju ~ distance_from_exchange, data = aug_2019_ju_dfe) %>%
+  tidy()
+aug_2019_ju_dfe_fit
+```
+
+
+```{r (feb) jitter downstream VS distance_from_exchange, echo=FALSE}
+feb_2019_jd_dfe <- feb_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_downstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_jd = mean(x24_hour_jitter_downstream)
+  )
+
+feb_2019_jd_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_jd ~ distance_from_exchange, data = feb_2019_jd_dfe) %>%
+  tidy()
+feb_2019_jd_dfe_fit
+```
+
+
+```{r (aug) jitter downstream VS distance_from_exchange, echo=FALSE}
+aug_2019_jd_dfe <- aug_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_jitter_downstream) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_jd = mean(x24_hour_jitter_downstream)
+  )
+
+aug_2019_jd_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_jd ~ distance_from_exchange, data = aug_2019_jd_dfe) %>%
+  tidy()
+aug_2019_jd_dfe_fit
+```
+
+Since jitter upstream is slightly negatively and positively correlated with distance from exchange in February and August respectively, it can be concluded that jitter is not directly related to distance from exchange. Hence, distance from exchange doesn’t affect call quality, which is affected by jitter.
+
+A number of residual plots were used to check the accuracy of the linear regression. All residual plots have points evenly distributed around zero, indicating that it is appropriate to use linear regression to analyze the relationships between these variables and distance from exchange.
+
+
+```{r (feb)residual plot(ads VS distance_from_exchange), echo=FALSE}
+feb_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = feb_2019_ads_dfe)
+feb_2019_ads_dfe_fit_aug  <- augment(feb_2019_ads_dfe_fit$fit)
+
+ggplot(feb_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ads", y = "Residuals")
+```
+
+
+```{r (aug)residual plot(ads VS distance_from_exchange), echo=FALSE}
+aug_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = aug_2019_ads_dfe)
+aug_2019_ads_dfe_fit_aug  <- augment(aug_2019_ads_dfe_fit$fit)
+
+ggplot(aug_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ads", y = "Residuals")
+```
+
+
+```{r (feb)residual plot(latency VS distance_from_exchange), echo=FALSE}
+feb_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = feb_2019_latency_dfe)
+feb_2019_latency_dfe_fit_aug  <- augment(feb_2019_latency_dfe_fit$fit)
+
+ggplot(feb_2019_latency_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_latency", y = "Residuals")
+```
+
+
+```{r (aug)residual plot(latency VS distance_from_exchange), echo=FALSE}
+aug_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = aug_2019_latency_dfe)
+aug_2019_latency_dfe_fit_aug  <- augment(aug_2019_latency_dfe_fit$fit)
+
+ggplot(aug_2019_latency_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_latency", y = "Residuals")
+```
+
+```{r (feb)residual plot(packet loss VS distance_from_exchange), echo=FALSE}
+feb_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = feb_2019_pl_dfe)
+feb_2019_pl_dfe_fit_aug  <- augment(feb_2019_pl_dfe_fit$fit)
+
+ggplot(feb_2019_pl_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_pl", y = "Residuals")
+```
+
+
+```{r (aug)residual plot(packet loss VS distance_from_exchange), echo=FALSE}
+aug_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = aug_2019_pl_dfe)
+aug_2019_pl_dfe_fit_aug  <- augment(aug_2019_pl_dfe_fit$fit)
+
+ggplot(aug_2019_pl_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_pl", y = "Residuals")
+```
+
+According to the following code, in 2019, the average download speed, latency and packet loss all greatly affect the page load time. Every 1Mbps increase in download speed decreases load time by 0.0017 seconds, every 1ms increase in latency increases load time by 0.037 seconds, and every 1% increase in packet loss increases load time by 0.29 seconds, on average. And these three parameters are all influenced by distance from exchange. Therefore it can be further concluded that distance from exchange indirectly affects the internet quality of life, such as the page load time.
+
+
+```{r (all) time to load webpage VS average download speed, latency and packet loss, echo=FALSE}
+all_2019_tlb_fit <- linear_reg() %>%
+  set_engine("glm") %>%
+  fit(log(x24_hour_time_to_load_webpage) ~ x24_hr_average_download_speed + x24_hour_latency + x24_hour_packet_loss, data = all_2019) %>%
+  tidy()
+all_2019_tlb_fit
+```
+
+
+```{r (all)residual plot(time to load webpage VS average download speed, latency and packet loss), echo=FALSE}
+all_2019_tlb_fit <- linear_reg() %>%
+  set_engine("glm") %>%
+  fit(log(x24_hour_time_to_load_webpage) ~ x24_hr_average_download_speed + x24_hour_latency + x24_hour_packet_loss, data = all_2019)
+all_2019_tlb_fit_aug  <- augment(all_2019_tlb_fit$fit)
+
+ggplot(all_2019_tlb_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted log", y = "Residuals")
+```
 
 ### Limitations of project
 One of the key limitations of our data was the fact that GDHI was given to us only by region. This made it difficult to compare households in the same areas which had different incomes - i.e. high income rural households vs low income rural households. As a result we were not able to see whether different incomes in areas affected the broadband speed that customers could obtain.
