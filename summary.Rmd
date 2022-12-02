@@ -804,9 +804,11 @@ Our presentation can be found [here](presentation/presentation.html).
 
 ### Data sources:
 
-https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
+2020, Fixed broadband speeds (February 2019 data), Ofcom, viewed Nov 16th 2022, https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
 
-https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
+2020, Fixed broadband speeds (August 2019 data), Ofcom, viewed Nov 16th 2022, https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
+
+2021, Regional gross disposable household income, UK: 1997 to 2019, viewed Nov 16th 2022, https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
 
 ### References for maps:
 
