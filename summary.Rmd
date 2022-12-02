@@ -25,9 +25,6 @@ For the purposes of our project, we will be mainly focusing on 24 hour average d
 
 ## Findings
 
-The write-up of your project and findings go here. 
-Think of this as the text of your presentation with some extra detail to cover what there was not time to discuss in the presentation. 
-
 comparison of feb and aug -> improvement in internet quality
 linear model: urbanrural/region/ghdi -> effect ads/jitter/packet loss
 prediction: p-value of ads
@@ -35,12 +32,51 @@ assumptions:
 limitations: 
 ideas for future work:
 
-You can also load your data here and present any analysis results / plots.
-Make sure to hide your code with  `echo = FALSE` unless the point you are trying to make is about the code itself, in which case you should show your code.
 
 
-```{r load-data, echo = FALSE}
-# load data here, if you like
+```{r load-data, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(janitor)
+library(geojsonio)
+library(ggplot2)
+library(dplyr)
+
+feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
+aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
+gdhi_region <- read.csv("data/gdhi_per_region.csv", skip = 1)
+
+feb_2019 <- feb_2019 %>%
+  clean_names() %>%
+  select(-ofcom_product) %>%    # These steps are to make the columns match the August dataset.
+  rename("distance_from_exchange" = "distance_from_exchange_band")
+  
+aug_2019 <- aug_2019 %>%
+  clean_names()
+
+regions <- c("United Kingdom", "England", "North East", "North West", "Yorkshire & Humber", "East Midlands", 
+             "West Midlands", "East", "London", "South East", "South West", "Wales", "Scotland", "Northern Ireland")
+
+gdhi_region <- gdhi_region %>%
+  clean_names() %>%
+  drop_na() %>%
+  rename("region" = "countries_and_regions_of_the_uk") %>%
+  mutate(region = regions,
+         gdhi_per_head = str_remove_all(gdhi_per_head, ","),
+         gdhi_per_head = as.numeric(gdhi_per_head)
+         )
+
+aug_2019_month <- aug_2019 %>%
+  mutate(month = "August")
+
+all_2019 <- feb_2019 %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_month)
+
+# Join datasets with gdhi_region set
+feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
+aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
+all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 ```
 
 ## Presentation
@@ -50,13 +86,13 @@ Our presentation can be found [here](presentation/presentation.html).
 
 ## References
 
-List any references here. You should, at a minimum, list your data source.
+### Data sources:
 
 https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
 
 https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
 
-References for maps:
+### References for maps:
 
 https://www.r-graph-gallery.com 
 
