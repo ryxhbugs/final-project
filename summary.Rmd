@@ -22,15 +22,6 @@ For the purposes of our project, we will be mainly focusing on 24 hour average d
 
 ## Findings
 
-comparison of feb and aug -> improvement in internet quality
-linear model: urbanrural/region/ghdi -> effect ads/jitter/packet loss
-prediction: p-value of ads
-assumptions: 
-limitations: 
-ideas for future work:
-
-
-
 ```{r load-data, echo = FALSE, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(tidymodels)
@@ -38,6 +29,9 @@ library(janitor)
 library(geojsonio)
 library(ggplot2)
 library(dplyr)
+library(spdplyr)
+library(tigris)
+library(RColorBrewer)
 
 feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
 aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
@@ -75,6 +69,83 @@ feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
 aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
 all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 ```
+### Initial data visualisation using choropleth maps
+
+To explore regional variations and see if there were any obvious trends or correlations, we initially created choropleth maps of the average 24 hour download speed in February and August, the GDHI, and the ratio between average download speed in urban and rural areas, for each region. These maps could then be compared to each other, to see if speeds had changed over time and if there were similarities in the spatial trends of different variables, and then these relationships could be investigated further in the models.
+
+```{r maps, fig.height = 5, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
+
+region_map <- geojson_read("uk_regions.geojson", what = "sp") %>%
+  rename(region = rgn19nm)
+
+feb_avg <- feb_2019 %>%
+  group_by(region) %>%
+  summarise(mean_24hr = mean(x24_hr_average_download_speed))
+
+feb_joined <- region_map %>%
+  geo_join(feb_avg, by = "region", how = "left")
+
+aug_avg <- aug_2019 %>%
+  group_by(region) %>%
+  summarise(mean_24hr = mean(x24_hr_average_download_speed))
+
+aug_joined <- region_map %>%
+  geo_join(aug_avg, by = "region", how = "left")
+
+reds <- brewer.pal(9, "Reds")
+blues <- brewer.pal(9, "Blues")
+greens <- brewer.pal(9, "Greens")
+
+class_feb <- cut(feb_joined$mean_24hr, 9)
+col_feb <- reds[as.numeric(class_feb)]
+
+class_aug <- cut(aug_joined$mean_24hr, 9)
+col_aug <- reds[as.numeric(class_aug)]
+
+gdhi_joined <- region_map %>%
+  geo_join(gdhi_region, by = "region", how = "left")
+
+class_gdhi <- cut(gdhi_joined$gdhi_per_head, 9)
+col_gdhi <- blues[as.numeric(class_gdhi)]
+
+disparity <- feb_2019 %>%
+  group_by(region, urban_rural) %>%
+  summarise(avg_24hr = mean(x24_hr_average_download_speed)) %>%
+  pivot_wider(names_from = urban_rural, values_from = avg_24hr) %>%
+  mutate(ratio = Urban/Rural)
+  
+disparity$ratio <- replace_na(disparity$ratio, 1)
+
+disparity_joined <- region_map %>%
+  geo_join(disparity, by = "region", how = "left")
+
+class_disp <- cut(disparity_joined$ratio, 9)
+col_disp <- greens[as.numeric(class_disp)]
+```
+
+```{r speed-maps,  fig.height = 5, fig.width = 10, message = FALSE, warning = FALSE, echo = FALSE}
+
+plot(feb_joined, col = col_feb, main = "UK 24 hour average broadband speed by region, February 2019",
+     sub = "Data from data.gov.uk")
+
+plot(aug_joined, col = col_aug, main = "UK 24 hour average broadband speed by region, August 2019",
+     sub = "Data from data.gov.uk")
+```
+These two maps both suggest a similar trend in average speeds - they seem to be higher on average in the south, but the highest speed is found in Yorkshire and Humberside in both despite low speeds in surrounding regions, and the lowest is in Wales. This pattern does not change significantly from February to August, although some speeds appear to become slightly higher. 
+
+```{r gdhi-map,  fig.height = 5, fig.width = 10, message = FALSE, warning = FALSE, echo = FALSE}
+
+plot(gdhi_joined, col = col_gdhi, main = "Gross disposable household income per region in the UK, 2019", 
+     sub = "Data from ons.gov.uk")
+```
+Comparing the GDHI map to the average download speed maps, we see that, while both have areas of higher values in the south, regions such as Yorkshire and Northern Ireland have high average speeds despite their comparatively low GDHI, suggesting that this relationship is more complex and there may be other variables involved.
+
+```{r ratio-map,  fig.height = 5, fig.width = 10, message = FALSE, warning = FALSE, echo = FALSE}
+
+plot(disparity_joined, col = col_disp, main = "Ratio of urban to rural download speeds in the UK, February 2019", 
+     sub = "Data from data.gov.uk")
+```
+This map suggests that the highest urban/rural disparities tend to be in areas with lower download speeds - the lowest being in Scotland and the highest in London - which could suggest that whether an area is urban or rural has an impact on internet quality. This could also imply a connection to population density, with the highest disparities being in areas of low population density, however this is beyond the scope of this project.
 
 ### The impact of GDHI and urban/rural location on internet quality
 To examine relationships between different variables in our dataset (variables which relate to location and internet quality of life, or IQOL) we experimented with fitting various linear models to our data. We started by looking primarily at investigating the link between the variables household income (GDHI per head, where GDHI stands for Gross Domestic Household Income), and Urban/Rural (whether a broadband customer lived in an urban or rural location), and internet quality of life indicators. We focused first on 24 hour average download speed, but then moved on to look at other variables such as packet loss and Netflix start up delay. Packet loss is when is when data packets sent over the internet fail to reach their destination (1), and this manifests itself in network disruption and slow service, which we felt were key when determining internet quality. We also focused on Netflix startup delay - given the rising popularity of internet streaming services, and the fact that Netflix is the most popular in the UK (2). A household with good internet quality of life would have high download speeds, lower packet loss, minimal startup delays, etc.
@@ -559,6 +630,166 @@ ggplot(all_2019_tlb_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   labs(x = "Predicted log", y = "Residuals")
 ```
 
+
+
+### Graphs of internet quality factors against variables effect
+
+```{r x24h_adv vs region, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = all_gdhi_join, 
+       aes(x = region, y = x24_hr_average_download_speed, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE, fullrange = TRUE) +
+  labs(
+    title = "Regions effect 24h average download speed, by urban/rural features",
+    x = "regions in UK",
+    y = "24h download speed",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+
+```{r x24h_adv vs def, echo = FALSE, message = FALSE, warning = FALSE}
+feb_2019_dfe_plot <- feb_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "01",
+      distance_from_exchange == "101 to 200m" ~ "02",
+      distance_from_exchange == "201 to 300m" ~ "03",
+      distance_from_exchange == "301 to 400m" ~ "04",
+      distance_from_exchange == "401 to 500m" ~ "05",
+      distance_from_exchange == "501 to 600m" ~ "06",
+      distance_from_exchange == "601 to 700m" ~ "07",
+      distance_from_exchange == "701 to 800m" ~ "08",
+      distance_from_exchange == "801 to 900m" ~ "09",
+      distance_from_exchange == "901 to 1000m" ~ "10",
+      distance_from_exchange == "1001 to 1100m" ~ "11",
+      distance_from_exchange == "1101 to 1200m" ~ "12",
+      distance_from_exchange == "1201 to 1300m" ~ "13",
+      distance_from_exchange == "1301 to 1400m" ~ "14",
+      distance_from_exchange == "1401 to 1500m" ~ "15",
+      distance_from_exchange == "1501 to 1600m" ~ "16",
+      distance_from_exchange == "1601 to 1700m" ~ "17",
+      distance_from_exchange == "1701 to 1800m" ~ "18",
+      distance_from_exchange == "1801 to 1900m" ~ "19",
+      distance_from_exchange == "1901 to 2000m" ~ "20",
+      distance_from_exchange == "2001 to 2100m" ~ "21",
+      distance_from_exchange == "2101 to 2200m" ~ "22",
+      distance_from_exchange == "2201 to 2300m" ~ "23",
+      distance_from_exchange == "2301 to 2400m" ~ "24",
+      distance_from_exchange == "2401 to 2500m" ~ "25",
+      distance_from_exchange == "2501 to 2600m" ~ "26",
+      distance_from_exchange == "2601 to 2700m" ~ "27",
+      distance_from_exchange == "2701 to 2800m" ~ "28",
+      distance_from_exchange == "2801 to 2900m" ~ "29",
+      distance_from_exchange == "2901 to 3000m" ~ "30",
+      distance_from_exchange == "3001 to 3250m" ~ "31",
+      distance_from_exchange == "3251 to 3500m" ~ "32",
+      distance_from_exchange == "3501 to 3750m" ~ "33",
+      distance_from_exchange == "3751 to 4000m" ~ "34",
+      distance_from_exchange == "4001 to 4500m" ~ "35",
+      distance_from_exchange == "4501 to 5000m" ~ "36",
+      distance_from_exchange == "5001 to 5500m" ~ "37",
+      distance_from_exchange == "Over 5500m" ~ "38"
+    ))
+aug_2019_dfe_plot <- aug_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "01",
+      distance_from_exchange == "101 to 200m" ~ "02",
+      distance_from_exchange == "201 to 300m" ~ "03",
+      distance_from_exchange == "301 to 400m" ~ "04",
+      distance_from_exchange == "401 to 500m" ~ "05",
+      distance_from_exchange == "501 to 600m" ~ "06",
+      distance_from_exchange == "601 to 700m" ~ "07",
+      distance_from_exchange == "701 to 800m" ~ "08",
+      distance_from_exchange == "801 to 900m" ~ "09",
+      distance_from_exchange == "901 to 1000m" ~ "10",
+      distance_from_exchange == "1001 to 1100m" ~ "11",
+      distance_from_exchange == "1101 to 1200m" ~ "12",
+      distance_from_exchange == "1201 to 1300m" ~ "13",
+      distance_from_exchange == "1301 to 1400m" ~ "14",
+      distance_from_exchange == "1401 to 1500m" ~ "15",
+      distance_from_exchange == "1501 to 1600m" ~ "16",
+      distance_from_exchange == "1601 to 1700m" ~ "17",
+      distance_from_exchange == "1701 to 1800m" ~ "18",
+      distance_from_exchange == "1801 to 1900m" ~ "19",
+      distance_from_exchange == "1901 to 2000m" ~ "20",
+      distance_from_exchange == "2001 to 2100m" ~ "21",
+      distance_from_exchange == "2101 to 2200m" ~ "22",
+      distance_from_exchange == "2201 to 2300m" ~ "23",
+      distance_from_exchange == "2301 to 2400m" ~ "24",
+      distance_from_exchange == "2401 to 2500m" ~ "25",
+      distance_from_exchange == "2501 to 2600m" ~ "26",
+      distance_from_exchange == "2601 to 2700m" ~ "27",
+      distance_from_exchange == "2701 to 2800m" ~ "28",
+      distance_from_exchange == "2801 to 2900m" ~ "29",
+      distance_from_exchange == "2901 to 3000m" ~ "30",
+      distance_from_exchange == "3001 to 3250m" ~ "31",
+      distance_from_exchange == "3251 to 3500m" ~ "32",
+      distance_from_exchange == "3501 to 3750m" ~ "33",
+      distance_from_exchange == "3751 to 4000m" ~ "34",
+      distance_from_exchange == "4001 to 4500m" ~ "35",
+      distance_from_exchange == "4501 to 5000m" ~ "36",
+      distance_from_exchange == "5001 to 5500m" ~ "37",
+      distance_from_exchange == "Over 5500m" ~ "38"
+    ))
+
+aug_2019_dfe_plot_month <- aug_2019_dfe_plot %>%
+  mutate(month = "August")
+all_2019_dfe_plot <- feb_2019_dfe_plot %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_dfe_plot_month)
+
+ggplot(data = all_2019_dfe_plot, 
+       aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  labs(
+    title = "distance effects 24h download speed, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h average download speed",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip() 
+```
+
+```{r x24h_packet_loss vs dfe, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = all_2019_dfe_plot, 
+       aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  labs(
+    title = "distance effects 24h packet loss, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h packet loss",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+
+```{r x24h_latency vs dfe, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = all_2019_dfe_plot, 
+       aes(x = distance_from_exchange, y = x24_hour_latency, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE) +
+  labs(
+    title = "distance effects 24h latency, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h latency",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+
+We assume that internet quality can be defined by average download speed, packet loss and latency on the internet in 24 hours. 
+And they are influenced by geolocations that whether users are at urban or rural as well as their regions located in the UK and distance from the exchange.
+We can see from the graphs that in rural areas, users generally experiened lower download speed, higher packet loss and higher latency. 
+Also, for distance from exchange, since the categories of the variable is too long to be used and would cause disordered y-axis, I redefine them as a new simple category.
+
 ### Limitations of project
 One of the key limitations of our data was the fact that GDHI was given to us only by region. This made it difficult to compare households in the same areas which had different incomes - i.e. high income rural households vs low income rural households. As a result we were not able to see whether different incomes in areas affected the broadband speed that customers could obtain.
 
@@ -573,9 +804,11 @@ Our presentation can be found [here](presentation/presentation.html).
 
 ### Data sources:
 
-https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
+2020, Fixed broadband speeds (February 2019 data), Ofcom, viewed Nov 16th 2022, https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
 
-https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
+2020, Fixed broadband speeds (August 2019 data), Ofcom, viewed Nov 16th 2022, https://www.data.gov.uk/dataset/dfe843da-06ca-4680-9ba0-fbb27319e402/uk-fixed-line-broadband-performance
+
+2021, Regional gross disposable household income, UK: 1997 to 2019, viewed Nov 16th 2022, https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/1997to2019
 
 ### References for maps:
 
