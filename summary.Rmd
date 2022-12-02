@@ -38,6 +38,9 @@ library(janitor)
 library(geojsonio)
 library(ggplot2)
 library(dplyr)
+library(spdplyr)
+library(tigris)
+library(RColorBrewer)
 
 feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
 aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
@@ -75,6 +78,83 @@ feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
 aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
 all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 ```
+### Initial data visualisation using choropleth maps
+
+To explore regional variations and see if there were any obvious trends or correlations, we initially created choropleth maps of the average 24 hour download speed in February and August, the GDHI, and the ratio between average download speed in urban and rural areas, for each region. These maps could then be compared to each other, to see if speeds had changed over time and if there were similarities in the spatial trends of different variables, and then these relationships could be investigated further in the models.
+
+```{r maps, fig.height = 5, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
+
+region_map <- geojson_read("uk_regions.geojson", what = "sp") %>%
+  rename(region = rgn19nm)
+
+feb_avg <- feb_2019 %>%
+  group_by(region) %>%
+  summarise(mean_24hr = mean(x24_hr_average_download_speed))
+
+feb_joined <- region_map %>%
+  geo_join(feb_avg, by = "region", how = "left")
+
+aug_avg <- aug_2019 %>%
+  group_by(region) %>%
+  summarise(mean_24hr = mean(x24_hr_average_download_speed))
+
+aug_joined <- region_map %>%
+  geo_join(aug_avg, by = "region", how = "left")
+
+reds <- brewer.pal(9, "Reds")
+blues <- brewer.pal(9, "Blues")
+greens <- brewer.pal(9, "Greens")
+
+class_feb <- cut(feb_joined$mean_24hr, 9)
+col_feb <- reds[as.numeric(class_feb)]
+
+class_aug <- cut(aug_joined$mean_24hr, 9)
+col_aug <- reds[as.numeric(class_aug)]
+
+gdhi_joined <- region_map %>%
+  geo_join(gdhi_region, by = "region", how = "left")
+
+class_gdhi <- cut(gdhi_joined$gdhi_per_head, 9)
+col_gdhi <- blues[as.numeric(class_gdhi)]
+
+disparity <- feb_2019 %>%
+  group_by(region, urban_rural) %>%
+  summarise(avg_24hr = mean(x24_hr_average_download_speed)) %>%
+  pivot_wider(names_from = urban_rural, values_from = avg_24hr) %>%
+  mutate(ratio = Urban/Rural)
+  
+disparity$ratio <- replace_na(disparity$ratio, 1)
+
+disparity_joined <- region_map %>%
+  geo_join(disparity, by = "region", how = "left")
+
+class_disp <- cut(disparity_joined$ratio, 9)
+col_disp <- greens[as.numeric(class_disp)]
+```
+
+```{r speed-maps,  fig.height = 5, fig.width = 10, message = FALSE, warning = FALSE, echo = FALSE}
+
+plot(feb_joined, col = col_feb, main = "UK 24 hour average broadband speed by region, February 2019",
+     sub = "Data from data.gov.uk")
+
+plot(aug_joined, col = col_aug, main = "UK 24 hour average broadband speed by region, August 2019",
+     sub = "Data from data.gov.uk")
+```
+These two maps both suggest a similar trend in average speeds - they seem to be higher on average in the south, but the highest speed is found in Yorkshire and Humberside in both despite low speeds in surrounding regions, and the lowest is in Wales. This pattern does not change significantly from February to August, although some speeds appear to become slightly higher. 
+
+```{r gdhi-map,  fig.height = 5, fig.width = 10, message = FALSE, warning = FALSE, echo = FALSE}
+
+plot(gdhi_joined, col = col_gdhi, main = "Gross disposable household income per region in the UK, 2019", 
+     sub = "Data from ons.gov.uk")
+```
+Comparing the GDHI map to the average download speed maps, we see that, while both have areas of higher values in the south, regions such as Yorkshire and Northern Ireland have high average speeds despite their comparatively low GDHI, suggesting that this relationship is more complex and there may be other variables involved.
+
+```{r ratio-map,  fig.height = 5, fig.width = 10, message = FALSE, warning = FALSE, echo = FALSE}
+
+plot(disparity_joined, col = col_disp, main = "Ratio of urban to rural download speeds in the UK, February 2019", 
+     sub = "Data from data.gov.uk")
+```
+This map suggests that the highest urban/rural disparities tend to be in areas with lower download speeds - the lowest being in Scotland and the highest in London - which could suggest that whether an area is urban or rural has an impact on internet quality. This could also imply a connection to population density, with the highest disparities being in areas of low population density, however this is beyond the scope of this project.
 
 ### The impact of GDHI and urban/rural location on internet quality
 To examine relationships between different variables in our dataset (variables which relate to location and internet quality of life, or IQOL) we experimented with fitting various linear models to our data. We started by looking primarily at investigating the link between the variables household income (GDHI per head, where GDHI stands for Gross Domestic Household Income), and Urban/Rural (whether a broadband customer lived in an urban or rural location), and internet quality of life indicators. We focused first on 24 hour average download speed, but then moved on to look at other variables such as packet loss and Netflix start up delay. Packet loss is when is when data packets sent over the internet fail to reach their destination (1), and this manifests itself in network disruption and slow service, which we felt were key when determining internet quality. We also focused on Netflix startup delay - given the rising popularity of internet streaming services, and the fact that Netflix is the most popular in the UK (2). A household with good internet quality of life would have high download speeds, lower packet loss, minimal startup delays, etc.
