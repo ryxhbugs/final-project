@@ -239,6 +239,7 @@ aug_joined <- region_map %>%
 
 reds <- brewer.pal(9, "Reds")
 blues <- brewer.pal(9, "Blues")
+greens <- brewer.pal(9, "Greens")
 
 class_feb <- cut(feb_joined$mean_24hr, 9)
 col_feb <- reds[as.numeric(class_feb)]
@@ -265,6 +266,14 @@ disparity <- feb_2019 %>%
   mutate(ratio = Urban/Rural)
   
 disparity$ratio <- replace_na(disparity$ratio, 1)
+
+disparity_joined <- region_map %>%
+  geo_join(disparity, by = "region", how = "left")
+
+class_disp <- cut(disparity_joined$ratio, 9)
+col_disp <- greens[as.numeric(class_disp)]
+plot(disparity_joined, col = col_disp, main = "Ratio of urban to rural download speeds in the UK, February 2019", 
+     sub = "Data from data.gov.uk")
 ```
 
 
