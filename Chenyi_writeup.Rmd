@@ -1,0 +1,223 @@
+---
+title: "Chenyi_writeup"
+output: html_document
+date: "2022-12-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(janitor)
+library(geojsonio)
+library(ggplot2)
+library(dplyr)
+library(spdplyr)
+library(tigris)
+library(RColorBrewer)
+```
+
+### Read in data from .csv files
+
+```{r load-data, message = FALSE}
+
+feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
+aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
+gdhi_region <- read.csv("data/gdhi_per_region.csv", skip = 1)
+
+```
+
+### Tidy the datasets to make them easier to use
+
+```{r clean-data}
+feb_2019 <- feb_2019 %>%
+  clean_names() %>%
+  select(-ofcom_product) %>%    # These steps are to make the columns match the August dataset.
+  rename("distance_from_exchange" = "distance_from_exchange_band")
+  
+aug_2019 <- aug_2019 %>%
+  clean_names()
+
+regions <- c("United Kingdom", "England", "North East", "North West", "Yorkshire & Humber", "East Midlands", 
+             "West Midlands", "East", "London", "South East", "South West", "Wales", "Scotland", "Northern Ireland")
+
+gdhi_region <- gdhi_region %>%
+  clean_names() %>%
+  drop_na() %>%
+  rename("region" = "countries_and_regions_of_the_uk") %>%
+  mutate(region = regions,
+         gdhi_per_head = str_remove_all(gdhi_per_head, ","),
+         gdhi_per_head = as.numeric(gdhi_per_head)
+         )
+
+aug_2019_month <- aug_2019 %>%
+  mutate(month = "August")
+
+all_2019 <- feb_2019 %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_month)
+
+# Join datasets with gdhi_region set
+feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
+aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
+all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
+
+```
+
+### Graphs of internet quality factors against variables effect
+
+```{r x24h_adv vs region}
+ggplot(data = all_gdhi_join, 
+       aes(x = region, y = x24_hr_average_download_speed, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE, fullrange = TRUE) +
+  labs(
+    title = "Regions effect 24h average download speed, by urban/rural features",
+    x = "regions in UK",
+    y = "24h download speed",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+```{r x24h_adv vs def}
+feb_2019_dfe_plot <- feb_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "01",
+      distance_from_exchange == "101 to 200m" ~ "02",
+      distance_from_exchange == "201 to 300m" ~ "03",
+      distance_from_exchange == "301 to 400m" ~ "04",
+      distance_from_exchange == "401 to 500m" ~ "05",
+      distance_from_exchange == "501 to 600m" ~ "06",
+      distance_from_exchange == "601 to 700m" ~ "07",
+      distance_from_exchange == "701 to 800m" ~ "08",
+      distance_from_exchange == "801 to 900m" ~ "09",
+      distance_from_exchange == "901 to 1000m" ~ "10",
+      distance_from_exchange == "1001 to 1100m" ~ "11",
+      distance_from_exchange == "1101 to 1200m" ~ "12",
+      distance_from_exchange == "1201 to 1300m" ~ "13",
+      distance_from_exchange == "1301 to 1400m" ~ "14",
+      distance_from_exchange == "1401 to 1500m" ~ "15",
+      distance_from_exchange == "1501 to 1600m" ~ "16",
+      distance_from_exchange == "1601 to 1700m" ~ "17",
+      distance_from_exchange == "1701 to 1800m" ~ "18",
+      distance_from_exchange == "1801 to 1900m" ~ "19",
+      distance_from_exchange == "1901 to 2000m" ~ "20",
+      distance_from_exchange == "2001 to 2100m" ~ "21",
+      distance_from_exchange == "2101 to 2200m" ~ "22",
+      distance_from_exchange == "2201 to 2300m" ~ "23",
+      distance_from_exchange == "2301 to 2400m" ~ "24",
+      distance_from_exchange == "2401 to 2500m" ~ "25",
+      distance_from_exchange == "2501 to 2600m" ~ "26",
+      distance_from_exchange == "2601 to 2700m" ~ "27",
+      distance_from_exchange == "2701 to 2800m" ~ "28",
+      distance_from_exchange == "2801 to 2900m" ~ "29",
+      distance_from_exchange == "2901 to 3000m" ~ "30",
+      distance_from_exchange == "3001 to 3250m" ~ "31",
+      distance_from_exchange == "3251 to 3500m" ~ "32",
+      distance_from_exchange == "3501 to 3750m" ~ "33",
+      distance_from_exchange == "3751 to 4000m" ~ "34",
+      distance_from_exchange == "4001 to 4500m" ~ "35",
+      distance_from_exchange == "4501 to 5000m" ~ "36",
+      distance_from_exchange == "5001 to 5500m" ~ "37",
+      distance_from_exchange == "Over 5500m" ~ "38"
+    ))
+aug_2019_dfe_plot <- aug_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "01",
+      distance_from_exchange == "101 to 200m" ~ "02",
+      distance_from_exchange == "201 to 300m" ~ "03",
+      distance_from_exchange == "301 to 400m" ~ "04",
+      distance_from_exchange == "401 to 500m" ~ "05",
+      distance_from_exchange == "501 to 600m" ~ "06",
+      distance_from_exchange == "601 to 700m" ~ "07",
+      distance_from_exchange == "701 to 800m" ~ "08",
+      distance_from_exchange == "801 to 900m" ~ "09",
+      distance_from_exchange == "901 to 1000m" ~ "10",
+      distance_from_exchange == "1001 to 1100m" ~ "11",
+      distance_from_exchange == "1101 to 1200m" ~ "12",
+      distance_from_exchange == "1201 to 1300m" ~ "13",
+      distance_from_exchange == "1301 to 1400m" ~ "14",
+      distance_from_exchange == "1401 to 1500m" ~ "15",
+      distance_from_exchange == "1501 to 1600m" ~ "16",
+      distance_from_exchange == "1601 to 1700m" ~ "17",
+      distance_from_exchange == "1701 to 1800m" ~ "18",
+      distance_from_exchange == "1801 to 1900m" ~ "19",
+      distance_from_exchange == "1901 to 2000m" ~ "20",
+      distance_from_exchange == "2001 to 2100m" ~ "21",
+      distance_from_exchange == "2101 to 2200m" ~ "22",
+      distance_from_exchange == "2201 to 2300m" ~ "23",
+      distance_from_exchange == "2301 to 2400m" ~ "24",
+      distance_from_exchange == "2401 to 2500m" ~ "25",
+      distance_from_exchange == "2501 to 2600m" ~ "26",
+      distance_from_exchange == "2601 to 2700m" ~ "27",
+      distance_from_exchange == "2701 to 2800m" ~ "28",
+      distance_from_exchange == "2801 to 2900m" ~ "29",
+      distance_from_exchange == "2901 to 3000m" ~ "30",
+      distance_from_exchange == "3001 to 3250m" ~ "31",
+      distance_from_exchange == "3251 to 3500m" ~ "32",
+      distance_from_exchange == "3501 to 3750m" ~ "33",
+      distance_from_exchange == "3751 to 4000m" ~ "34",
+      distance_from_exchange == "4001 to 4500m" ~ "35",
+      distance_from_exchange == "4501 to 5000m" ~ "36",
+      distance_from_exchange == "5001 to 5500m" ~ "37",
+      distance_from_exchange == "Over 5500m" ~ "38"
+    ))
+
+aug_2019_dfe_plot_month <- aug_2019_dfe_plot %>%
+  mutate(month = "August")
+all_2019_dfe_plot <- feb_2019_dfe_plot %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_dfe_plot_month)
+
+ggplot(data = all_2019_dfe_plot, 
+       aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  labs(
+    title = "distance effects 24h download speed, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h average download speed",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip() 
+```
+```{r x24h_packet_loss vs dfe}
+ggplot(data = all_2019_dfe_plot, 
+       aes(x = distance_from_exchange, y = x24_hour_packet_loss, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  labs(
+    title = "distance effects 24h packet loss, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h packet loss",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+```{r x24h_latency vs dfe}
+ggplot(data = all_2019_dfe_plot, 
+       aes(x = distance_from_exchange, y = x24_hour_latency, colour = urban_rural)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(formula = y~x, method = "lm", se = FALSE) +
+  labs(
+    title = "distance effects 24h latency, by urban/rural features",
+    x = "distance from exchange",
+    y = "24h latency",
+    color = "urban/rural"
+  ) +
+  scale_color_manual(values = c("#E48957", "#071381")) +
+  coord_flip()
+```
+
+We assume that internet quality can be defined by average download speed, packet loss and latency on the internet in 24 hours. 
+And they are influenced by geolocations that whether users are at urban or rural as well as their regions located in the UK and distance from the exchange.
+We can see from the graphs that in rural areas, users generally experiened lower download speed, higher packet loss and higher latency. 
+Also, for distance from exchange, since the categories of the variable is too long to be used and would cause disordered y-axis, I redefine them as a new simple category.
