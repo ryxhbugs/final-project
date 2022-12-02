@@ -4,7 +4,7 @@
     <title>Geographical Location and Internet Quality of Life</title>
     <meta charset="utf-8" />
     <meta name="author" content="Team Members - Zhihong Chen, Ryan Hall, Chenyi He, Eric Rogers, Eddie Washbrook" />
-    <meta name="date" content="2022-12-01" />
+    <meta name="date" content="2022-12-02" />
     <script src="libs/header-attrs-2.18/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### University of Edinburgh
 ]
 .date[
-### 2022-12-01
+### 2022-12-02
 ]
 
 ---
@@ -36,6 +36,14 @@ class: center, middle, inverse, title-slide
 
 
 
+
+
+```r
+# Load your data here
+feb_2019 &lt;- read.csv("data/broadband_data_february_2019.csv")
+aug_2019 &lt;- read.csv("data/broadband_data_august_2019.csv")
+gdhi_region &lt;- read.csv("data/gdhi_per_region.csv", skip = 1)
+```
 
 
 
@@ -63,17 +71,160 @@ Ryan
 
 ---
 
-# Linear Modelling
+## Linear Modelling
 
-Chenyi
+# How does GDHI per head affect IQOL:
+
+```
+## # A tibble: 2 × 5
+##   term          estimate std.error statistic      p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 (Intercept)   42.0      7.83          5.36 0.0000000881
+## 2 gdhi_per_head  0.00130  0.000369      3.52 0.000435
+```
+
+```
+## # A tibble: 2 × 5
+##   term          estimate    std.error statistic   p.value
+##   &lt;chr&gt;            &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    1.30e-3 0.000325         3.99  0.0000672
+## 2 gdhi_per_head -8.47e-9 0.0000000153    -0.553 0.580
+```
+
+```
+## # A tibble: 2 × 5
+##   term           estimate std.error statistic   p.value
+##   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   32.4      1.10           29.4 1.12e-170
+## 2 gdhi_per_head -0.000769 0.0000519     -14.8 3.12e- 48
+```
+
+```
+## # A tibble: 2 × 5
+##   term           estimate std.error statistic  p.value
+##   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   1373.      73.9         18.6  9.54e-74
+## 2 gdhi_per_head   -0.0128   0.00347     -3.68 2.37e- 4
+```
+# How does living in urban or rural area affect IQOL:
+
+```
+## # A tibble: 2 × 5
+##   term             estimate std.error statistic   p.value
+##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)          44.1      2.00      22.0 1.34e-101
+## 2 urban_ruralUrban     44.3      2.50      17.7 1.32e- 67
+```
+
+```
+## # A tibble: 2 × 5
+##   term               estimate std.error statistic  p.value
+##   &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)       0.00114   0.0000809    14.1   3.36e-44
+## 2 urban_ruralUrban -0.0000563 0.000101     -0.557 5.78e- 1
+```
+
+```
+## # A tibble: 2 × 5
+##   term             estimate std.error statistic  p.value
+##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)         18.8      0.271      69.2 0       
+## 2 urban_ruralUrban    -4.30     0.339     -12.7 4.32e-36
+```
+
+```
+## # A tibble: 2 × 5
+##   term             estimate std.error statistic  p.value
+##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)         1311.      18.1      72.6 0       
+## 2 urban_ruralUrban    -364.      22.4     -16.3 7.73e-58
+```
+# A tiny change from Feburary to August:
+
+```
+## # A tibble: 2 × 5
+##   term             estimate std.error statistic  p.value
+##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)          43.2      2.72      15.9 5.81e-54
+## 2 urban_ruralUrban     43.1      3.40      12.7 1.28e-35
+```
+
+```
+## # A tibble: 2 × 5
+##   term             estimate std.error statistic  p.value
+##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)          45.0      2.96      15.2 1.60e-49
+## 2 urban_ruralUrban     45.7      3.70      12.3 9.24e-34
+```
+# How do GDHI per head and Urban/rural area affect 24 hours average download speed:
+
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: linear_reg()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_dummy()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## 
+## Call:
+## stats::lm(formula = ..y ~ ., data = data)
+## 
+## Coefficients:
+##       (Intercept)      gdhi_per_head  urban_rural_Urban  
+##         3.915e+01          1.673e-04          4.264e+01
+```
+
+---
+# How does distance from exchange affect Internet quality of life?
+---
+
+(2019)average_download_speed VS distance_from_exchange(dfe)
+
+```
+## # A tibble: 2 × 5
+##   term                   estimate std.error statistic  p.value
+##   &lt;chr&gt;                     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)            89.1       5.11        17.4  3.80e-19
+## 2 distance_from_exchange -0.00742   0.00204     -3.64 8.60e- 4
+```
+(2019) latency VS distance_from_exchange(dfe)
+
+```
+## # A tibble: 2 × 5
+##   term                   estimate std.error statistic  p.value
+##   &lt;chr&gt;                     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)            13.0      0.770        16.8  1.19e-18
+## 2 distance_from_exchange  0.00121  0.000308      3.94 3.55e- 4
+```
+(2019) packet loss VS distance_from_exchange(dfe)
+
+```
+## # A tibble: 2 × 5
+##   term                      estimate    std.error statistic   p.value
+##   &lt;chr&gt;                        &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)            0.000837    0.000172          4.87 0.0000221
+## 2 distance_from_exchange 0.000000139 0.0000000687      2.03 0.0502
+```
+
+---
+(2019)residual plot(advatage_download_speed VS distance_from_exchange(dfe))
+&lt;img src="presentation_files/figure-html/(all)residual plot(ads VS distance_from_exchange)-1.png" width="80%" /&gt;
+
+---
+(2019)residual plot(latency VS distance_from_exchange(dfe))
+&lt;img src="presentation_files/figure-html/(all)residual plot(latency VS distance_from_exchange)-1.png" width="80%" /&gt;
+
+---
+(2019)residual plot(packet loss VS distance_from_exchange(dfe))
+&lt;img src="presentation_files/figure-html/(all)residual plot(packet loss VS distance_from_exchange)-1.png" width="80%" /&gt;
 
 ---
 
-# Model Accuracy - Residual Plots
-
-Zhihong
-
----
 
 # Model Training and Prediction
 

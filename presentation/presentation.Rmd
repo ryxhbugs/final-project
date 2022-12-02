@@ -25,6 +25,13 @@ library(tidymodels)
 library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
+library(janitor)
+library(geojsonio)
+library(ggplot2)
+library(dplyr)
+library(spdplyr)
+library(tigris)
+library(RColorBrewer)
 ```
 
 ```{r setup, include=FALSE}
@@ -43,6 +50,41 @@ gdhi_region <- read.csv("data/gdhi_per_region.csv", skip = 1)
 style_xaringan(
   title_slide_background_image = "img/wallpaper2.jpg"
 )
+```
+
+```{r clean-data, echo=FALSE}
+feb_2019 <- feb_2019 %>%
+  clean_names() %>%
+  select(-ofcom_product) %>%    # These steps are to make the columns match the August dataset.
+  rename("distance_from_exchange" = "distance_from_exchange_band")
+  
+aug_2019 <- aug_2019 %>%
+  clean_names()
+
+regions <- c("United Kingdom", "England", "North East", "North West", "Yorkshire & Humber", "East Midlands", 
+             "West Midlands", "East", "London", "South East", "South West", "Wales", "Scotland", "Northern Ireland")
+
+gdhi_region <- gdhi_region %>%
+  clean_names() %>%
+  drop_na() %>%
+  rename("region" = "countries_and_regions_of_the_uk") %>%
+  mutate(region = regions,
+         gdhi_per_head = str_remove_all(gdhi_per_head, ","),
+         gdhi_per_head = as.numeric(gdhi_per_head)
+         )
+
+aug_2019_month <- aug_2019 %>%
+  mutate(month = "August")
+
+all_2019 <- feb_2019 %>%
+  mutate(month = "February") %>%
+  rbind(aug_2019_month)
+
+# Join datasets with gdhi_region set
+feb_gdhi_join <- left_join(feb_2019, gdhi_region , by = "region")
+aug_gdhi_join <- left_join(aug_2019, gdhi_region , by = "region")
+all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
+
 ```
 
 # Recap
@@ -174,12 +216,145 @@ all_gdhi_join_train_fit
 ```
 
 ---
+# How does distance from exchange affect Internet quality of life?
+---
 
-# Model Accuracy - Residual Plots
+(2019)average_download_speed VS distance_from_exchange(dfe)
+```{r (all)average_download_speed VS distance_from_exchange, echo=FALSE}
+all_2019_dfe <- all_2019 %>%
+  drop_na() %>%
+  mutate(
+    distance_from_exchange = case_when(
+      distance_from_exchange == "0 to 100m" ~ "50",
+      distance_from_exchange == "101 to 200m" ~ "150",
+      distance_from_exchange == "201 to 300m" ~ "250",
+      distance_from_exchange == "301 to 400m" ~ "350",
+      distance_from_exchange == "401 to 500m" ~ "450",
+      distance_from_exchange == "501 to 600m" ~ "550",
+      distance_from_exchange == "601 to 700m" ~ "650",
+      distance_from_exchange == "701 to 800m" ~ "750",
+      distance_from_exchange == "801 to 900m" ~ "850",
+      distance_from_exchange == "901 to 1000m" ~ "950",
+      distance_from_exchange == "1001 to 1100m" ~ "1050",
+      distance_from_exchange == "1101 to 1200m" ~ "1150",
+      distance_from_exchange == "1201 to 1300m" ~ "1250",
+      distance_from_exchange == "1301 to 1400m" ~ "1350",
+      distance_from_exchange == "1401 to 1500m" ~ "1450",
+      distance_from_exchange == "1501 to 1600m" ~ "1550",
+      distance_from_exchange == "1601 to 1700m" ~ "1650",
+      distance_from_exchange == "1701 to 1800m" ~ "1750",
+      distance_from_exchange == "1801 to 1900m" ~ "1850",
+      distance_from_exchange == "1901 to 2000m" ~ "1950",
+      distance_from_exchange == "2001 to 2100m" ~ "2050",
+      distance_from_exchange == "2101 to 2200m" ~ "2150",
+      distance_from_exchange == "2201 to 2300m" ~ "2250",
+      distance_from_exchange == "2301 to 2400m" ~ "2350",
+      distance_from_exchange == "2401 to 2500m" ~ "2450",
+      distance_from_exchange == "2501 to 2600m" ~ "2550",
+      distance_from_exchange == "2601 to 2700m" ~ "2650",
+      distance_from_exchange == "2701 to 2800m" ~ "2750",
+      distance_from_exchange == "2801 to 2900m" ~ "2850",
+      distance_from_exchange == "2901 to 3000m" ~ "2950",
+      distance_from_exchange == "3001 to 3250m" ~ "3125",
+      distance_from_exchange == "3251 to 3500m" ~ "3375",
+      distance_from_exchange == "3501 to 3750m" ~ "3625",
+      distance_from_exchange == "3751 to 4000m" ~ "3875",
+      distance_from_exchange == "4001 to 4500m" ~ "4250",
+      distance_from_exchange == "4501 to 5000m" ~ "4750",
+      distance_from_exchange == "5001 to 5500m" ~ "5250",
+      distance_from_exchange == "Over 5500m" ~ "5500"
+    ))
 
-Zhihong
+all_2019_dfe$distance_from_exchange <- as.numeric(as.character(all_2019_dfe$distance_from_exchange))
+
+all_2019_ads_dfe <- all_2019_dfe %>%
+  select(distance_from_exchange, x24_hr_average_download_speed) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_ads = mean(x24_hr_average_download_speed)
+  )
+
+all_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = all_2019_ads_dfe) %>%
+  tidy()
+all_2019_ads_dfe_fit
+```
+(2019) latency VS distance_from_exchange(dfe)
+```{r (all) latency VS distance_from_exchange, echo=FALSE}
+all_2019_latency_dfe <- all_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_latency) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_latency = mean(x24_hour_latency)
+  )
+
+all_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = all_2019_latency_dfe) %>%
+  tidy()
+all_2019_latency_dfe_fit
+```
+(2019) packet loss VS distance_from_exchange(dfe)
+```{r (all) packet loss VS distance_from_exchange, echo=FALSE}
+all_2019_pl_dfe <- all_2019_dfe %>%
+  select(distance_from_exchange, x24_hour_packet_loss) %>%
+  group_by(distance_from_exchange) %>%
+  summarise(
+    avg_pl = mean(x24_hour_packet_loss)
+  )
+
+all_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = all_2019_pl_dfe) %>%
+  tidy()
+all_2019_pl_dfe_fit
+```
 
 ---
+(2019)residual plot(advatage_download_speed VS distance_from_exchange(dfe))
+```{r (all)residual plot(ads VS distance_from_exchange), echo=FALSE}
+all_2019_ads_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_ads ~ distance_from_exchange, data = all_2019_ads_dfe)
+all_2019_ads_dfe_fit_aug  <- augment(all_2019_ads_dfe_fit$fit)
+
+ggplot(all_2019_ads_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_ads", y = "Residuals")
+```
+
+---
+(2019)residual plot(latency VS distance_from_exchange(dfe))
+```{r (all)residual plot(latency VS distance_from_exchange), echo=FALSE}
+all_2019_latency_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_latency ~ distance_from_exchange, data = all_2019_latency_dfe)
+all_2019_latency_dfe_fit_aug  <- augment(all_2019_latency_dfe_fit$fit)
+
+ggplot(all_2019_latency_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_latency", y = "Residuals")
+```
+
+---
+(2019)residual plot(packet loss VS distance_from_exchange(dfe))
+```{r (all)residual plot(packet loss VS distance_from_exchange), echo=FALSE}
+all_2019_pl_dfe_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(avg_pl ~ distance_from_exchange, data = all_2019_pl_dfe)
+all_2019_pl_dfe_fit_aug  <- augment(all_2019_pl_dfe_fit$fit)
+
+ggplot(all_2019_pl_dfe_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted avg_pl", y = "Residuals")
+```
+
+---
+
 
 # Model Training and Prediction
 

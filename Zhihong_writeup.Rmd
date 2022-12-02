@@ -318,7 +318,7 @@ aug_2019_jd_dfe_fit
 
 Since jitter upstream is slightly negatively and positively correlated with distance from exchange in February and August respectively, it can be concluded that jitter is not directly related to distance from exchange. Hence, distance from exchange doesn’t affect call quality, which is affected by jitter.
 
-A number of residual plots were used to check the accuracy of the linear regression. All residual plots have points evenly distributed around zero, indicating that it is appropriate to use linear regression to analyze the relationships between these variables between distance from exchange.
+A number of residual plots were used to check the accuracy of the linear regression. All residual plots have points evenly distributed around zero, indicating that it is appropriate to use linear regression to analyze the relationships between these variables and distance from exchange.
 
 
 ```{r (feb)residual plot(ads VS distance_from_exchange), echo=FALSE}
