@@ -39,8 +39,7 @@ library(RColorBrewer)
 knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618, out.width = "80%")
 ```
 
-```{r load-data, message = FALSE, echo = FALSE}
-# Load your data here
+```{r load-data, message = FALSE, echo=FALSE}
 feb_2019 <- read.csv("data/broadband_data_february_2019.csv")
 aug_2019 <- read.csv("data/broadband_data_august_2019.csv")
 gdhi_region <- read.csv("data/gdhi_per_region.csv", skip = 1)
@@ -95,11 +94,12 @@ all_gdhi_join <- left_join(all_2019, gdhi_region , by = "region")
 
 ---
 
-# Findings
+# Findings / Summary
 
  - We saw trends in the data that exist between location and Internet QOL
- - Not enough data to be able to back up this link
- - Unable to establish a clear/strong connection given the data we had
+ - Not enough data to be able to back up this link fully
+ - Unable to establish a clear/strong connection given the data we had for some variables
+ - Limited Data (GDHI per region)
 
 ---
 
@@ -112,7 +112,10 @@ knitr::include_graphics(c("maps/gdhi.png","maps/ratio.png"))
 
 ---
 
+class: inverse, center, middle
+
 ## Linear Modelling
+---
 
 # How does GDHI per head affect IQOL:
 ```{r income-24h_download, echo = FALSE}
@@ -147,7 +150,8 @@ all_24h_nsud_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_nsud_gdhi_fit
 ```
-# How does living in urban or rural area affect IQOL:
+---
+# Urban or rural areas - IQOL:
 ```{r urbanrural-24h_download, echo = FALSE}
 all_24h_ads_ur_fit <- linear_reg() %>%
   set_engine("lm") %>%
@@ -179,6 +183,7 @@ all_24h_nsud_gdhi_fit <- linear_reg() %>%
   tidy()
 all_24h_nsud_gdhi_fit
 ```
+---
 # A tiny change from Feburary to August:
 ```{r urbanrural-24h_download-feb, echo = FALSE}
 feb_24h_ads_ur_fit <- linear_reg() %>%
@@ -194,6 +199,7 @@ aug_24h_ads_ur_fit <- linear_reg() %>%
   tidy()
 aug_24h_ads_ur_fit
 ```
+---
 # How do GDHI per head and Urban/rural area affect 24 hours average download speed:
 ```{r setseed-split, echo=FALSE}
 set.seed(1234)
@@ -219,6 +225,9 @@ all_gdhi_join_train_fit
 ```
 
 ---
+
+class: inverse, center, middle
+
 # How does distance from exchange affect Internet quality of life?
 ---
 
